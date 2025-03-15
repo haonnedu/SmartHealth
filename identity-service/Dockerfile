@@ -5,7 +5,7 @@ LABEL authors="hao.nn"
 WORKDIR /app
 
 # Copy file JAR từ thư mục target vào container
-COPY target/identity-service.jar identity-service.jar
+COPY target/identity-service-0.0.1-SNAPSHOT.jar identity-service.jar
 
 # Expose cổng 8081 để ứng dụng có thể truy cập từ bên ngoài
 EXPOSE 8081
