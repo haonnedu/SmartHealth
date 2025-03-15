@@ -3,6 +3,8 @@ package com.smartHealth.identity_service.service;
 import com.smartHealth.identity_service.dto.reqeuest.UserCreationRequest;
 import com.smartHealth.identity_service.dto.reqeuest.UserUpdateRequest;
 import com.smartHealth.identity_service.entity.User;
+import com.smartHealth.identity_service.exception.AppException;
+import com.smartHealth.identity_service.exception.MessageCode;
 import com.smartHealth.identity_service.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,8 +21,9 @@ public class UserService {
 
     public User createRequest(UserCreationRequest request) {
         User user = new User();
+
         if(userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            throw new AppException(MessageCode.USER_EXISTED);
         }
 
         user.setUsername(request.getUsername());
