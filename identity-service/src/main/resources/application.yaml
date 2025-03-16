@@ -5,8 +5,8 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://mysql-db:3306/${MYSQL_DATABASE}?serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
-    username: MySecureRootPass123!
+    url: jdbc:mysql://27.77.115.46:3306/identity_service?serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+    username: identity_admin
     password: MyStrongPassword456@
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
@@ -15,7 +15,11 @@ spring:
       idle-timeout: 30000
       max-lifetime: 1800000
       connection-timeout: 30000
-
+  security:
+    oauth2:
+      resource server:
+        jwt:
+          issuer-uri: http://27.77.115.46:8080/realms/SmartHealth
   jpa:
     hibernate:
       ddl-auto: update # Options: create, create-drop, update, validate
@@ -24,15 +28,11 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
+keycloak:
+  admin:
+    server-url: http://27.77.115.46:8080/
+    realm: SmartHealth
+    client-id: admin-cli
+    username: admin
+    password: admin
 
-  profiles:
-    active: dev # Set the active profile (e.g., dev, prod)
-
-# Logging configuration (optional)
-logging:
-  level:
-    org:
-      hibernate: INFO
-      springframework: INFO
-    com:
-      yourpackage: DEBUG
