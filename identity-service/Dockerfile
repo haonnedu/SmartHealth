@@ -1,4 +1,3 @@
-# Sử dụng Java 23 làm môi trường chạy ứng dụng
 FROM eclipse-temurin:23-jdk-alpine
 LABEL authors="hao.nn"
 # Đặt thư mục làm việc trong container
