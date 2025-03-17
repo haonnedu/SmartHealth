@@ -53,6 +53,23 @@ services:
     networks:
       - smarthealth_network
 
+  clinic-web:
+    build:
+      context: ./web-app/clinic-website
+      dockerfile: Dockerfile
+    container_name: clinic_web
+    restart: always
+    depends_on:
+      - mysql-db
+      - keycloak
+      - identity-service
+    environment:
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    networks:
+      - smarthealth_network
+
 volumes:
   mysql_data:
 
