@@ -1,0 +1,25 @@
+/* Tailwind mặc định */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Biến CSS cho nền (background) & chữ (foreground) */
+:root {
+    --background: #f8fafc;
+    --foreground: #1f2937;
+}
+
+/* Dark mode: khi thêm class .dark vào <html> hoặc <body> */
+.dark {
+    --background: #1f2937;
+    --foreground: #f8fafc;
+}
+
+/* Sử dụng layer base để đặt style chung */
+@layer base {
+    body {
+        /* Dùng arbitrary value của Tailwind → bg-[var(--background)] */
+        /* Hoặc: bg-[color:var(--background)] nếu cần. */
+        @apply bg-[var(--background)] text-[var(--foreground)];
+    }
+}
