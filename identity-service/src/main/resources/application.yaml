@@ -32,7 +32,18 @@ keycloak:
   admin:
     server-url: http://27.77.115.46:8080/
     realm: SmartHealth
-    client-id: admin-cli
+    client-id: smarthealth-app
     username: admin
     password: admin
-
+  realm: SmartHealth
+  auth-server-url: http://27.77.115.46:8080/
+  ssl-required: external
+  public-client: true
+  bearer-only: false
+  client-id: smarthealth-app
+  client-secret: EPqQ0BoKLRN3mgatc9VzWce43TcvNZU2
+  username: admin
+  password: admin123
+logging:
+  level:
+    org.springframework.security: DEBUG

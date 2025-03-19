@@ -27,12 +27,12 @@ public class KeycloakService {
     private final String adminPassword;
 
     public KeycloakService(
-            @Value("${keycloak.server-url}") String serverUrl,
+            @Value("${keycloak.auth-server-url}") String serverUrl,
             @Value("${keycloak.realm}") String realm,
             @Value("${keycloak.client-id}") String clientId,
             @Value("${keycloak.client-secret}") String clientSecret,
-            @Value("${keycloak.admin-username}") String adminUsername,
-            @Value("${keycloak.admin-password}") String adminPassword) {
+            @Value("${keycloak.username}") String adminUsername,
+            @Value("${keycloak.password}") String adminPassword) {
 
         this.serverUrl = serverUrl;
         this.realm = realm;
@@ -45,8 +45,9 @@ public class KeycloakService {
     private Keycloak getKeycloakInstance() {
         return KeycloakBuilder.builder()
                 .serverUrl(serverUrl)
-                .realm("master") // Use "master" to get admin access
+                .realm(realm) // Use "master" to get admin access
                 .clientId(clientId)
+                .clientSecret(clientSecret)
                 .username(adminUsername)
                 .password(adminPassword)
                 .grantType(OAuth2Constants.PASSWORD)
