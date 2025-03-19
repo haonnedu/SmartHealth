@@ -44,6 +44,7 @@ services:
     restart: always
     depends_on:
       - mysql-db
+      - keycloak
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/${MYSQL_DATABASE}?serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
