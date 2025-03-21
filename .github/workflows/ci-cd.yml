@@ -67,7 +67,8 @@ jobs:
           username: root
           port: 24700
           password: ${{ secrets.SERVER_PASSWORD }}
-          script: |
-            cd /root/clinic-management
-            docker-compose pull
-            docker-compose up -d
+        script: |
+          cd /root/clinic-management
+          docker-compose pull
+          docker-compose down
+          docker-compose up -d --force-recreate
