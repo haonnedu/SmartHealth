@@ -53,7 +53,7 @@ services:
     command: ["start-dev"]
 
   identity-service:
-    build: ./identity-service
+    image: ${DOCKER_USERNAME}/smarthealth-identity-service:latest
     container_name: identity_service
     restart: always
     depends_on:
@@ -73,9 +73,7 @@ services:
       - smarthealth_network
 
   clinic-web:
-    build:
-      context: ./web-app/clinic-website
-      dockerfile: Dockerfile
+    image: ${DOCKER_USERNAME}/smarthealth-clinic-web:latest
     container_name: clinic_web
     restart: always
     depends_on:
