@@ -1,13 +1,28 @@
-FROM eclipse-temurin:23-jdk-alpine
-LABEL authors="hao.nn"
-# Đặt thư mục làm việc trong container
+# Stage 1: Build ứng dụng Spring Boot
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
+
+# Thiết lập thư mục làm việc
 WORKDIR /app
 
-# Copy file JAR từ thư mục target vào container
-COPY target/identity-service-0.0.1-SNAPSHOT.jar identity-service.jar
+# Copy file pom.xml và tải dependencies
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
 
-# Expose cổng 8081 để ứng dụng có thể truy cập từ bên ngoài
+# Copy toàn bộ mã nguồn và build
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Stage 2: Tạo image chạy ứng dụng
+FROM eclipse-temurin:17-jre-alpine
+
+# Thiết lập thư mục làm việc
+WORKDIR /app
+
+# Copy file JAR từ stage build
+COPY --from=builder /app/target/*.jar app.jar
+
+# Mở port ứng dụng
 EXPOSE 8081
 
-# Chạy ứng dụng Spring Boot
-CMD ["java", "-jar", "identity-service.jar"]
+# Lệnh chạy ứng dụng
+ENTRYPOINT ["java", "-jar", "app.jar"]
