@@ -2,10 +2,12 @@ import * as React from "react";
 import { cn } from "@/lib/utils"; // Hàm tiện ích ghép class
 
 export interface ButtonProps
-    extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+    extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+        variant?: "default" | "outline" | "solid";
+    }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-    ({ className, children, ...props }, ref) => {
+    ({ className, children , variant= "default", ...props }, ref) => {
       return (
           <button
               className={cn(
