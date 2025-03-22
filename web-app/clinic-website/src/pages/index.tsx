@@ -1,7 +1,7 @@
 import UserLayout from "@/layouts/UserLayout";
 
-export default function UserHome() {
-  return <div>Trang người dùng</div>;
+export default function Home() {
+  return <div>Đây là trang người dùng</div>;
 }
 
-UserHome.getLayout = (page: React.ReactNode) => <UserLayout>{page}</UserLayout>;
+Home.getLayout = (page: React.ReactNode) => <UserLayout>{page}</UserLayout>;
