@@ -6,16 +6,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "gen:types": "openapi-typescript http://localhost:8081/identity/v3/api-docs -o src/types/api-types.ts"
   },
   "dependencies": {
-    "@radix-ui/react-label": "^2.1.2",
-    "@radix-ui/react-slot": "^1.1.2",
+    "@mantine/core": "^7.17.2",
+    "@mantine/hooks": "^7.17.2",
+    "@mantine/notifications": "^7.17.2",
     "@tanstack/react-query": "^5.68.0",
     "@tanstack/react-query-devtools": "^5.68.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "keycloak-js": "^26.1.4",
     "lucide-react": "^0.482.0",
     "next": "13.4.19",
     "next-auth": "^4.22.1",
@@ -31,6 +32,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.21",
+    "openapi-typescript": "^7.6.1",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.0.14",
     "typescript": "^5"

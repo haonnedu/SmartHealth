@@ -1,23 +1,6 @@
 import { GalleryVerticalEnd } from "lucide-react";
 
-import { LoginForm } from "@/components/auth/LoginForm";
-import { useKeycloak } from "@/contexts/KeycloakContext";
-import { useRouter } from "next/router";
-import { useEffect } from "react";
-
 export default function LoginPage() {
-  const { keycloak, loading, authenticated } = useKeycloak();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (authenticated && keycloak) {
-      router.push("/dashboard"); // Chuyển hướng đến trang Dashboard nếu đã đăng nhập
-    }
-  }, [authenticated, keycloak, router]);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
@@ -35,10 +18,7 @@ export default function LoginPage() {
             <p className="text-center text-gray-600">
               Please log in with Keycloak
             </p>
-            <button
-              onClick={() => keycloak?.login()}
-              className="w-full bg-blue-500 text-white p-2 rounded mt-4"
-            >
+            <button className="w-full bg-blue-500 text-white p-2 rounded mt-4">
               Login with Keycloak
             </button>
           </div>
