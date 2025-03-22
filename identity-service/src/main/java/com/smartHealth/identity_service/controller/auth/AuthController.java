@@ -3,6 +3,8 @@ package com.smartHealth.identity_service.controller.auth;
 import com.smartHealth.identity_service.dto.reqeuest.ForgotPasswordRequest;
 import com.smartHealth.identity_service.dto.reqeuest.LoginRequest;
 import com.smartHealth.identity_service.dto.reqeuest.RegisterRequest;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.core.Response;
 import org.keycloak.admin.client.Keycloak;
@@ -28,6 +30,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "API Auth", description = "API author management")
 public class AuthController {
     @Value("${keycloak.admin.server-url}")
     private String keycloakServerUrl;
@@ -63,6 +66,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         String tokenEndpoint = keycloakServerUrl + "/realms/" + realm + "/protocol/openid-connect/token";
 
