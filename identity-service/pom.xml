@@ -5,8 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.3</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<version>3.2.5</version>
 	</parent>
 	<groupId>com.smartHealth</groupId>
 	<artifactId>identity-service</artifactId>
@@ -99,9 +98,12 @@
 			<artifactId>javax.ws.rs-api</artifactId>
 			<version>2.1.1</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.2.0</version>
+		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<!-- Maven Compiler Plugin -->
@@ -129,5 +131,4 @@
 
 		</plugins>
 	</build>
-
 </project>
