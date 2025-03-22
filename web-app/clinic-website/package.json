@@ -34,6 +34,7 @@
     "autoprefixer": "^10.4.21",
     "openapi-typescript": "^7.6.1",
     "postcss": "^8.5.3",
+    "postcss-preset-mantine": "^1.17.0",
     "tailwindcss": "^4.0.14",
     "typescript": "^5"
   }
