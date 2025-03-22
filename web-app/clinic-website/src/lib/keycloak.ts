@@ -5,7 +5,7 @@ let keycloak: KeycloakInstance;
 export const initKeycloak = (): Promise<KeycloakInstance> => {
   // Khởi tạo Keycloak với từ khóa 'new'
   keycloak = new Keycloak({
-    url: "http://27.77.115.46:8080",
+    url: "http://103.166.183.74:8080",
     realm: "SmartHealth", // Tên realm của bạn
     clientId: "smarthealth-app", // Client ID của bạn
   });

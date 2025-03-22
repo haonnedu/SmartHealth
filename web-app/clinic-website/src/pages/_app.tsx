@@ -3,17 +3,21 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { AppProps } from "next/app";
 import "../styles/globals.css";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { KeycloakProvider } from "@/contexts/KeycloakContext";
+import { MantineProvider } from "@mantine/core";
+import "@mantine/core/styles.css";
 
 const queryClient = new QueryClient();
 
 export default function MyApp({ Component, pageProps }: AppProps) {
+  const getLayout =
+    (Component as any).getLayout || ((page: React.ReactNode) => page);
+
   return (
-    <KeycloakProvider>
+    <MantineProvider>
       <QueryClientProvider client={queryClient}>
-        <Component {...pageProps} />
+        {getLayout(<Component {...pageProps} />)}
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
-    </KeycloakProvider>
+    </MantineProvider>
   );
 }
