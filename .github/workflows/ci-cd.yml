@@ -70,5 +70,5 @@ jobs:
           script: |
             cd /root/clinic-management
             docker-compose pull
-            docker-compose down
-            docker-compose up -d --force-recreate
+            docker-compose pull identity-service clinic-web
+            docker-compose up -d --no-deps --force-recreate identity-service clinic-web
