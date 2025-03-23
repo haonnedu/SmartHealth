@@ -51,6 +51,7 @@ springdoc:
   api-docs:
     enabled: true
     path: /v3/api-docs
+    media-type: application/json
   swagger-ui:
     enabled: true
     path: /swagger-ui.html
