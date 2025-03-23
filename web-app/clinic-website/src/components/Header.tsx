@@ -46,7 +46,7 @@ export function HeaderTabs() {
 
   return (
     <div className={classes.header}>
-      <Container className={classes.mainSection} size="md">
+      <Container className={classes.mainSection} size="xl">
         <Group justify="space-between">
           <UnstyledButton>
             <Text fw={500} size="sm" lh={1} mr={3}>
@@ -149,9 +149,9 @@ export function HeaderTabs() {
           </Menu>
         </Group>
       </Container>
-      <Container size="md">
+      <Container size="xl">
         <Tabs
-          defaultValue="Home"
+          defaultValue="/"
           variant="outline"
           visibleFrom="sm"
           classNames={{
