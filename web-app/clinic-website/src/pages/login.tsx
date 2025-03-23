@@ -1,36 +1,46 @@
-import { GalleryVerticalEnd } from "lucide-react";
+// pages/login.tsx
+import { useState } from "react";
+import { TextInput, Button } from "@mantine/core";
+import { useLogin } from "@/hooks/useLogin";
 
 export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { mutate, isLoading, isError } = useLogin();
+
+  const handleLogin = () => {
+    mutate(
+      { email, password },
+      {
+        onSuccess: (data) => {
+          localStorage.setItem("access_token", data.access_token);
+          // Optional: fetch user profile and redirect
+          window.location.href = "/"; // or use next/router
+        },
+        onError: () => {
+          alert("Login failed!");
+        },
+      }
+    );
+  };
+
   return (
-    <div className="grid min-h-svh lg:grid-cols-2">
-      <div className="flex flex-col gap-4 p-6 md:p-10">
-        <div className="flex justify-center gap-2 md:justify-start">
-          <a href="#" className="flex items-center gap-2 font-medium">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
-              <GalleryVerticalEnd className="size-4" />
-            </div>
-            SmartHealth
-          </a>
-        </div>
-        <div className="flex flex-1 items-center justify-center">
-          <div className="w-full max-w-xs">
-            {/* <LoginForm /> */}
-            <p className="text-center text-gray-600">
-              Please log in with Keycloak
-            </p>
-            <button className="w-full bg-blue-500 text-white p-2 rounded mt-4">
-              Login with Keycloak
-            </button>
-          </div>
-        </div>
-      </div>
-      <div className="relative hidden bg-muted lg:block">
-        <img
-          src="/images/next.svg"
-          alt="Image"
-          className="flex h-full w-full items-center justify-center"
-        />
-      </div>
+    <div>
+      <TextInput
+        label="Email"
+        value={email}
+        onChange={(e) => setEmail(e.currentTarget.value)}
+      />
+      <TextInput
+        label="Password"
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.currentTarget.value)}
+      />
+      <Button onClick={handleLogin} loading={isLoading}>
+        Login
+      </Button>
+      {isError && <p style={{ color: "red" }}>Sai tài khoản hoặc mật khẩu</p>}
     </div>
   );
 }
