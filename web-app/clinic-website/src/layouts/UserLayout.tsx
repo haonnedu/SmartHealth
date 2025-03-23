@@ -1,6 +1,7 @@
 import { AppShell } from "@mantine/core";
 import { ReactNode } from "react";
 import { HeaderTabs } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 export default function UserLayout({ children }: { children: ReactNode }) {
   return (
@@ -9,6 +10,7 @@ export default function UserLayout({ children }: { children: ReactNode }) {
         <HeaderTabs />
       </AppShell.Header>
       <AppShell.Main>{children}</AppShell.Main>
+      <Footer />
     </AppShell>
   );
 }
