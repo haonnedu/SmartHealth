@@ -1,46 +1,41 @@
-// // pages/login.tsx
-// import { useState } from "react";
-// import { TextInput, Button } from "@mantine/core";
-// // import { useLogin } from "@/hooks/useLogin";
+import { useState } from "react";
+import { LoginRequest } from "@/lib/api/types/type.gen";
+import { useLogin } from "@/service/auth/auth.hook";
 
-// // export default function LoginPage() {
-// //   const [email, setEmail] = useState("");
-// //   const [password, setPassword] = useState("");
-// //   const { mutate, isLoading, isError } = useLogin();
+export default function LoginPage() {
+  const [form, setForm] = useState<LoginRequest>({
+    username: "",
+    password: "",
+  });
+  const login = useLogin();
 
-// //   const handleLogin = () => {
-// //     mutate(
-// //       { email, password },
-// //       {
-// //         onSuccess: (data) => {
-// //           localStorage.setItem("access_token", data.access_token);
-// //           // Optional: fetch user profile and redirect
-// //           window.location.href = "/"; // or use next/router
-// //         },
-// //         onError: () => {
-// //           alert("Login failed!");
-// //         },
-// //       }
-// //     );
-// //   };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-//   return (
-//     <div>
-//       <TextInput
-//         label="Email"
-//         value={email}
-//         onChange={(e) => setEmail(e.currentTarget.value)}
-//       />
-//       <TextInput
-//         label="Password"
-//         type="password"
-//         value={password}
-//         onChange={(e) => setPassword(e.currentTarget.value)}
-//       />
-//       <Button onClick={handleLogin} loading={isLoading}>
-//         Login
-//       </Button>
-//       {isError && <p style={{ color: "red" }}>Sai tài khoản hoặc mật khẩu</p>}
-//     </div>
-//   );
-// }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    login.mutate(form);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        name="username"
+        value={form.username}
+        onChange={handleChange}
+        placeholder="Username"
+      />
+      <input
+        name="password"
+        type="password"
+        value={form.password}
+        onChange={handleChange}
+        placeholder="Password"
+      />
+      <button type="submit" disabled={login.isPending}>
+        {login.isPending ? "Logging in..." : "Login"}
+      </button>
+    </form>
+  );
+}
