@@ -98,7 +98,7 @@ services:
       - smarthealth_network
 
 volumes:
-  mysql_data:
+  pgdata:
 
 networks:
   smarthealth_network:
