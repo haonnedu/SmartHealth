@@ -7,6 +7,11 @@ services:
       POSTGRES_DB: identity_service
       POSTGRES_USER: identity_admin
       POSTGRES_PASSWORD: MyStrongPassword456@
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
     ports:
       - "5432:5432"
     volumes:
@@ -14,34 +19,34 @@ services:
     networks:
       - smarthealth_network
 
-    keycloak:
-      image: quay.io/keycloak/keycloak:latest
-      container_name: keycloak
-      environment:
-        KC_DB: postgres
-        KC_DB_URL: jdbc:postgresql://postgres-db:5432/identity_service
-        KC_DB_USERNAME: identity_admin
-        KC_DB_PASSWORD: MyStrongPassword456@
-      command:
-        - start
-        - --hostname=keycloak.smarthealth.io.vn
-        - --hostname-strict=false
-        - --http-port=8080
-        - --auto-config
-        - --auto-config-admin-user=admin
-        - --auto-config-admin-password=admin
-      ports:
-        - "8080:8080"
-      restart: always
-      deploy:
-        resources:
-          limits:
-            cpus: "0.5"
-            memory: 768M
-      depends_on:
-        - postgres-db
-      networks:
-        - smarthealth_network
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres-db:5432/identity_service
+      KC_DB_USERNAME: identity_admin
+      KC_DB_PASSWORD: MyStrongPassword456@
+    command:
+      - start
+      - --hostname=keycloak.smarthealth.io.vn
+      - --hostname-strict=false
+      - --http-port=8080
+      - --auto-config
+      - --auto-config-admin-user=admin
+      - --auto-config-admin-password=admin
+    ports:
+      - "8080:8080"
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+    depends_on:
+      - postgres-db
+    networks:
+      - smarthealth_network
 
   identity-service:
     image: ${DOCKER_USERNAME}/smarthealth-identity-service:latest
