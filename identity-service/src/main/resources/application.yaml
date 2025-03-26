@@ -5,7 +5,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://103.166.183.74:5432/identity_service?allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:postgresql://postgres-db:5432/identity_service
     username: identity_admin
     password: MyStrongPassword456!
     driver-class-name: com.mysql.cj.jdbc.Driver
