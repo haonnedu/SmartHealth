@@ -10,7 +10,7 @@ export class IdentityRoute {
   async login(@Body() body: any) {
     const response = await firstValueFrom(
       this.httpService.post(
-        'http://identity-service:8081/identity/api/auth/login',
+        'https://identity-service:8081/identity/api/auth/login',
         body,
       ),
     );
