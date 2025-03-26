@@ -15,32 +15,20 @@ services:
       - smarthealth_network
 
   keycloak:
-    image: quay.io/keycloak/keycloak:latest
-    container_name: keycloak
-    restart: always
-    environment:
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres-db:5432/identity_service
-      KC_DB_USERNAME: identity_admin
-      KC_DB_PASSWORD: MyStrongPassword456@
-    ports:
-      - "8080:8080"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
-      interval: 1s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    depends_on:
-      - postgres-db
-    deploy:
-      resources:
-        limits:
-          cpus: "0.3"
-          memory: 512M
-    networks:
-      - smarthealth_network
-    command: ["start-dev"]
+    realm: SmartHealth
+    auth-server-url: https://keycloak.smarthealth.io.vn/
+    ssl-required: external
+    public-client: false
+    bearer-only: false
+
+    client:
+      id: smarthealth-app
+      secret: EPqQ0BoKLRN3mgatc9VzWce43TcvNZU2
+
+    admin:
+      username: admin
+      password: admin123
+      server-url: https://keycloak.smarthealth.io.vn/
 
   identity-service:
     image: ${DOCKER_USERNAME}/smarthealth-identity-service:latest
