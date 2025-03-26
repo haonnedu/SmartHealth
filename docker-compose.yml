@@ -92,8 +92,7 @@ services:
     networks:
       - smarthealth_network
   api-gateway:
-    build:
-      context: ${DOCKER_USERNAME}/smarthealth-api-gateway:latest
+    image: ${DOCKER_USERNAME}/smarthealth-api-gateway:latest
     container_name: api_gateway
     restart: always
     depends_on:
