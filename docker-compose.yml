@@ -1,22 +1,16 @@
 services:
-  mysql-db:
-    image: mysql:8.0.36
-    container_name: mysql_identity
+  postgres-db:
+    image: postgres:15
+    container_name: postgres_identity
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      POSTGRES_DB: identity_service
+      POSTGRES_USER: identity_admin
+      POSTGRES_PASSWORD: MyStrongPassword456@
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
-    deploy:
-      resources:
-        limits:
-          cpus: "0.2"
-          memory: 256M
+      - pgdata:/var/lib/postgresql/data
     networks:
       - smarthealth_network
 
@@ -25,14 +19,10 @@ services:
     container_name: keycloak
     restart: always
     environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_DB: mysql
-      KC_DB_URL: jdbc:mysql://mysql-db:3306/keycloak
-      KC_DB_USERNAME: ${MYSQL_USER}
-      KC_DB_PASSWORD: ${MYSQL_PASSWORD}
-      KC_HTTP_PORT: 8080
-      KEYCLOAK_HTTP_PORT: 8080
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres-db:5432/identity_service
+      KC_DB_USERNAME: identity_admin
+      KC_DB_PASSWORD: MyStrongPassword456@
     ports:
       - "8080:8080"
     healthcheck:
@@ -59,9 +49,9 @@ services:
     depends_on:
       - mysql-db
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/${MYSQL_DATABASE}?serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
-      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/identity_service
+      SPRING_DATASOURCE_USERNAME: identity_admin
+      SPRING_DATASOURCE_PASSWORD: MyStrongPassword456@
     ports:
       - "8081:8081"
     deploy:
