@@ -1,33 +1,31 @@
-# 1. Chọn base image Node.js LTS
+# Base image để build
 FROM node:18-alpine AS builder
 
-# 2. Tạo thư mục làm việc
 WORKDIR /app
 
-# 3. Copy file package.json và package-lock.json (nếu có)
+# Copy file cấu hình env
+COPY .env.production .env.production
+
+# Copy package trước để cache hiệu quả
 COPY package*.json ./
 
-# 4. Cài đặt dependencies
 RUN npm install
 
-# 5. Copy toàn bộ mã nguồn
+# Copy toàn bộ source
 COPY . .
 
-# 6. Build dự án Next.js
+# Build với env production
+ENV NODE_ENV=production
 RUN npm run build
 
-# 7. Dùng một image nhỏ hơn để chạy
+# Image nhỏ để chạy production
 FROM node:18-alpine AS runner
 
 WORKDIR /app
 
-# Copy thư mục .next, node_modules, package.json từ giai đoạn build
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 
-# 8. Expose cổng
 EXPOSE 3000
-
-# 9. Lệnh chạy server Next.js
 CMD ["npm", "run", "start"]

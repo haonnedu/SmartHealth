@@ -1,10 +1,10 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { IdentityRoute } from './routes/identity.route';
 
 @Module({
   imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [HttpModule],
+  providers: [IdentityRoute],
 })
 export class AppModule {}
