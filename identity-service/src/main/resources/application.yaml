@@ -5,9 +5,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://postgres-db:5432/identity_service
+    url: jdbc:postgresql://103.166.183.74:5432/identity_service
     username: identity_admin
-    password: MyStrongPassword456!
+    password: MyStrongPassword456@
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -26,8 +26,9 @@ spring:
     show-sql: true
     properties:
       hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
 keycloak:
   admin:
     server-url: http://keycloak.smarthealth.io.vn/
