@@ -32,6 +32,13 @@ services:
       - --auto-config
       - --auto-config-admin-user=admin
       - --auto-config-admin-password=admin
+    deploy:
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 256M
+    networks:
+      - smarthealth_network
 
   identity-service:
     image: ${DOCKER_USERNAME}/smarthealth-identity-service:latest
