@@ -15,20 +15,23 @@ services:
       - smarthealth_network
 
   keycloak:
-    realm: SmartHealth
-    auth-server-url: https://keycloak.smarthealth.io.vn/
-    ssl-required: external
-    public-client: false
-    bearer-only: false
-
-    client:
-      id: smarthealth-app
-      secret: EPqQ0BoKLRN3mgatc9VzWce43TcvNZU2
-
-    admin:
-      username: admin
-      password: admin123
-      server-url: https://keycloak.smarthealth.io.vn/
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres-db:5432/identity_service
+      KC_DB_USERNAME: identity_admin
+      KC_DB_PASSWORD: MyStrongPassword456@
+      KC_HOSTNAME_STRICT: "false"
+      KC_PROXY: edge
+    command:
+      - start
+      - --hostname=keycloak.smarthealth.io.vn
+      - --hostname-strict=false
+      - --proxy=edge
+      - --https-port=8443
+      - --auto-config
+      - --auto-config-admin-user=admin
+      - --auto-config-admin-password=admin
 
   identity-service:
     image: ${DOCKER_USERNAME}/smarthealth-identity-service:latest
