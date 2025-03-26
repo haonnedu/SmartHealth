@@ -5,7 +5,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://103.166.183.74:3306/identity_service?allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:postgresql://postgres-db:5432/identity_service
     username: identity_admin
     password: MyStrongPassword456!
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -16,10 +16,10 @@ spring:
       max-lifetime: 1800000
       connection-timeout: 30000
   security:
-      oauth2:
-        resourceserver:
-          jwt:
-            issuer-uri: http://keycloak.smarthealth.io.vn/realms/SmartHealth
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak.smarthealth.io.vn/realms/SmartHealth
   jpa:
     hibernate:
       ddl-auto: update # Options: create, create-drop, update, validate
@@ -56,5 +56,3 @@ springdoc:
     enabled: true
     path: /swagger-ui.html
     url: /v3/api-docs
-
-
