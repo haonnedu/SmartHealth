@@ -27,7 +27,7 @@ services:
       - start
       - --hostname=keycloak.smarthealth.io.vn
       - --hostname-strict=false
-      - --proxy=edge
+      - --http-port=8080
       - --https-port=8443
       - --auto-config
       - --auto-config-admin-user=admin
