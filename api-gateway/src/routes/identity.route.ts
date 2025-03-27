@@ -17,12 +17,12 @@ export class AuthController {
   async login(@Body() body: any) {
     console.log('Received login request:', body);
     try {
-      console.log(
-        'Calling identity_service at http://identity_service:8081/identity/api/auth/login',
-      );
       const response = await firstValueFrom(
         this.httpService
-          .post('http://identity_service:8081/identity/api/auth/login', body)
+          .post(
+            'https://identity.smarthealth.io.vn/identity/api/auth/login',
+            body,
+          )
           .pipe(
             catchError((error) => {
               console.error(
