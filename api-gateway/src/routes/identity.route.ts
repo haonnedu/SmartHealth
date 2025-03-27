@@ -10,7 +10,7 @@ export class IdentityRoute {
   async login(@Body() body: any) {
     const response = await firstValueFrom(
       this.httpService.post(
-        'https://identity.smarthealth.io.vn/identity/api/auth/login',
+        'http://identity.smarthealth.io.vn/identity/api/auth/login',
         body,
       ),
     );
