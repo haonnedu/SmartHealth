@@ -61,8 +61,20 @@ jobs:
           npm install
           npm run build
 
-      # -------------------- Docker Push --------------------
+      - name: Cache Node.js modules for api-gateway
+        uses: actions/cache@v4
+        with:
+          path: ./api-gateway/node_modules
+          key: ${{ runner.os }}-node-api-gateway-${{ hashFiles('./api-gateway/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-api-gateway-
 
+      - name: Build api-gateway
+        working-directory: ./api-gateway
+        run: |
+          npm install
+          npm run build
+      # -------------------- Docker Push --------------------
       # Bước 8: Log in to Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
