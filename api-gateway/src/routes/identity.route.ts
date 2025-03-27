@@ -1,4 +1,10 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpStatus,
+  HttpException,
+} from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 
@@ -8,12 +14,20 @@ export class IdentityRoute {
 
   @Post('login')
   async login(@Body() body: any) {
-    const response = await firstValueFrom(
-      this.httpService.post(
-        'http://identity.smarthealth.io.vn/identity/api/auth/login',
-        body,
-      ),
-    );
-    return response.data;
+    try {
+      const response = await firstValueFrom(
+        this.httpService.post(
+          'http://identity_service:8081/identity/api/auth/login',
+          body,
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error calling identity_service:', error.message);
+      throw new HttpException(
+        'Failed to login: ' + error.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
