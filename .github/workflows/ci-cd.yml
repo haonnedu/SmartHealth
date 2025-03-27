@@ -57,7 +57,7 @@ jobs:
       - name: Build clinic-web
         working-directory: ./web-app/clinic-website
         run: |
-          echo "NEXT_PUBLIC_API_URL=http://identity.smarthealth.io.vn/identity" > .env.production
+          echo "NEXT_PUBLIC_API_URL=https://api.smarthealth.io.vn/api" > .env.production
           npm ci
           npm run build
 
