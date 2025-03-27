@@ -19,7 +19,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://keycloak.smarthealth.io.vn/realms/SmartHealth
+          issuer-uri: https://keycloak.smarthealth.io.vn/realms/SmartHealth
   jpa:
     hibernate:
       ddl-auto: update # Options: create, create-drop, update, validate
@@ -31,18 +31,18 @@ spring:
             non_contextual_creation: true
 keycloak:
   admin:
-    server-url: http://keycloak.smarthealth.io.vn/
+    server-url: https://keycloak.smarthealth.io.vn/
     realm: SmartHealth
-    client-id: smarthealth-app
+    client-id: gateway-local
     username: admin
     password: admin
   realm: SmartHealth
-  auth-server-url: http://keycloak.smarthealth.io.vn/
+  auth-server-url: https://keycloak.smarthealth.io.vn/
   ssl-required: external
   public-client: true
   bearer-only: false
-  client-id: smarthealth-app
-  client-secret: EPqQ0BoKLRN3mgatc9VzWce43TcvNZU2
+  client-id: gateway-local
+  client-secret: sGEUrF63LZ7nT9m2CzHPb7i8kp960A5i
   username: admin
   password: admin123
 logging:
