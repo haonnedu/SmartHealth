@@ -7,6 +7,6 @@ async function bootstrap() {
     origin: 'https://smarthealth.io.vn', // The domain of your Next.js frontend
     credentials: true, // Important if you use withCredentials
   });
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(3001);
 }
 bootstrap();
