@@ -44,23 +44,26 @@ jobs:
         with:
           node-version: "20"
 
-      # Bước 6: Cache Node.js modules
-      - name: Cache Node.js modules
+      # Bước 6: Cache Node.js modules for clinic-web
+      - name: Cache Node.js modules for clinic-web
         uses: actions/cache@v4
         with:
           path: ./web-app/clinic-website/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('./web-app/clinic-website/package-lock.json') }}
+          key: ${{ runner.os }}-node-clinic-web-${{ hashFiles('./web-app/clinic-website/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-node-clinic-web-
 
       # Bước 7: Build clinic-web
       - name: Build clinic-web
         working-directory: ./web-app/clinic-website
         run: |
           echo "NEXT_PUBLIC_API_URL=http://identity.smarthealth.io.vn/identity" > .env.production
-          npm install
+          npm ci
           npm run build
 
+      # -------------------- API Gateway --------------------
+
+      # Bước 8: Cache Node.js modules for api-gateway
       - name: Cache Node.js modules for api-gateway
         uses: actions/cache@v4
         with:
@@ -69,32 +72,37 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-api-gateway-
 
+      # Bước 9: Build api-gateway
       - name: Build api-gateway
         working-directory: ./api-gateway
         run: |
-          npm install
-          npm run build
+          npm ci
+          npm run build --if-present
+
       # -------------------- Docker Push --------------------
-      # Bước 8: Log in to Docker Hub
+
+      # Bước 10: Log in to Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Bước 9: Build & Push identity-service Docker image
+      # Bước 11: Build & Push identity-service Docker image
       - name: Build and push identity-service
         working-directory: ./identity-service
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/smarthealth-identity-service:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/smarthealth-identity-service:latest
 
-      # Bước 10: Build & Push clinic-web Docker image
+      # Bước 12: Build & Push clinic-web Docker image
       - name: Build and push clinic-web
         working-directory: ./web-app/clinic-website
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/smarthealth-clinic-web:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/smarthealth-clinic-web:latest
+
+      # Bước 13: Build & Push api-gateway Docker image
       - name: Build and push api-gateway
         working-directory: ./api-gateway
         run: |
