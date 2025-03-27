@@ -14,7 +14,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000", "https://smartehealth.io.vn")
+                        .allowedOrigins("http://localhost:3000", "https://smartehealth.io.vn", "https://api.smartehealth.io.vn")
                         .allowedMethods("*")
                         .allowedHeaders("*")
                         .allowCredentials(true);
