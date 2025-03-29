@@ -25,12 +25,13 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import classes from "@/styles/HeaderTabs.module.css";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 const user = {
   name: "Hao Nguyen",
   email: "janspoon@fighter.dev",
   image:
-    "https://scontent.fsgn5-3.fna.fbcdn.net/v/t39.30808-6/475712132_2092450211235754_2570560166146676736_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=5bSAgiHOkxYQ7kNvgGg7K4S&_nc_oc=AdkIrTCFVE9bKB1a9-GKnGjA5RvAcZvj3BsykyIBgURiE7223CEwAwPRPNMw5mtdifY&_nc_zt=23&_nc_ht=scontent.fsgn5-3.fna&_nc_gid=gDvct4fnLk7Y8z5msWLk1Q&oh=00_AYEOysG4HJmmtBoAPWVXXSENy50VN2Rl4bqRUK29ptM70A&oe=67E49D90",
+    "https://scontent.fsgn5-13.fna.fbcdn.net/v/t39.30808-1/475712132_2092450211235754_2570560166146676736_n.jpg?stp=cp6_dst-jpg_s160x160_tt6&_nc_cat=104&ccb=1-7&_nc_sid=e99d92&_nc_ohc=Dt4CutXDCZgQ7kNvgF98TWh&_nc_oc=Adme_O9oD7OBqb4zRdU0Q4oDsWctzLGV02HSbA7JrqFUVREUX8g3WH_fqc-15Sm6G6g&_nc_zt=24&_nc_ht=scontent.fsgn5-13.fna&_nc_gid=LSemaRbiTYiayXBTvWVMEw&oh=00_AYFS3ToytnV88vhcau0TLwYwJFxV5XgqdYNm8R9yOMk6Iw&oe=67EC6C8E",
 };
 
 const tabs = [
@@ -43,6 +44,7 @@ export function HeaderTabs() {
   const theme = useMantineTheme();
   const [opened, { toggle }] = useDisclosure(false);
   const [userMenuOpened, setUserMenuOpened] = useState(false);
+  const router = useRouter();
 
   return (
     <div className={classes.header}>
@@ -151,7 +153,7 @@ export function HeaderTabs() {
       </Container>
       <Container size="xl">
         <Tabs
-          defaultValue="/"
+          value={router.pathname}
           variant="outline"
           visibleFrom="sm"
           classNames={{

@@ -166,3 +166,10 @@ a.secondary {
     filter: invert();
   }
 }
+
+.control {
+  &[data-inactive] {
+    opacity: 0;
+    cursor: default;
+  }
+}

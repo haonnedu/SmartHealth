@@ -3,7 +3,7 @@ import { Container, Grid, Text, Anchor, Divider, Group } from "@mantine/core";
 
 export function Footer() {
   return (
-    <footer>
+    <footer className="bg-gray-100">
       <Divider my="md" />
       <Container size="xl" py="md">
         <Grid>

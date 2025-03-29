@@ -10,15 +10,20 @@
     "gen:api": "node ./node_modules/swagger-typescript-api/dist/cli.cjs generate -p http://localhost:8081/identity/v3/api-docs -o ./src/lib/api/types -n type.gen.ts --axios"
   },
   "dependencies": {
-    "@mantine/core": "^7.17.2",
+    "@mantine/carousel": "^7.17.3",
+    "@mantine/core": "^7.17.3",
+    "@mantine/dates": "^7.17.3",
     "@mantine/hooks": "^7.17.2",
-    "@mantine/notifications": "^7.17.2",
+    "@mantine/notifications": "^7.17.3",
     "@tabler/icons-react": "^3.31.0",
+    "@tailwindcss/cli": "^4.0.17",
     "@tanstack/react-query": "^5.68.0",
     "@tanstack/react-query-devtools": "^5.68.0",
     "axios": "^1.8.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dayjs": "^1.11.13",
+    "embla-carousel-react": "^8.5.2",
     "lucide-react": "^0.482.0",
     "next": "13.4.19",
     "next-auth": "^4.22.1",
@@ -29,7 +34,6 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.0.14",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -38,7 +42,7 @@
     "postcss": "^8.5.3",
     "postcss-preset-mantine": "^1.17.0",
     "swagger-typescript-api": "^13.0.24",
-    "tailwindcss": "^4.0.14",
+    "tailwindcss": "^3.4.17",
     "typescript": "^5"
   }
 }
