@@ -1,15 +1,15 @@
 import {
-  Modal,
   Button,
-  TextInput,
-  Select,
-  Radio,
+  Divider,
   Group,
   Image,
-  Text,
-  Stack,
+  Modal,
+  Radio,
+  Select,
   SimpleGrid,
-  Divider,
+  Stack,
+  Text,
+  TextInput,
 } from "@mantine/core";
 import { useState } from "react";
 interface AuthModalProps {
@@ -25,7 +25,7 @@ export function BookingModal({ opened, onClose }: AuthModalProps) {
       onClose={onClose}
       title="Chỗ đặt khả dụng"
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 w-[800px] gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 md:w-[800px] gap-6">
         {/* LEFT: Doctor + Slots */}
         <div>
           <Group align="flex-start">
