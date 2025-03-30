@@ -1,8 +1,8 @@
-import { AppShell } from "@mantine/core";
-import { ReactNode } from "react";
-import { HeaderTabs } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { HeaderTabs } from "@/components/Header";
+import { AppShell } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
+import { ReactNode } from "react";
 
 export default function UserLayout({ children }: { children: ReactNode }) {
   const isMobile = useMediaQuery("(max-width: 768px)");

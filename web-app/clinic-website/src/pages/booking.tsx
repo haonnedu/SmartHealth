@@ -1,7 +1,6 @@
 import { BookingModal } from "@/components/frontSite/BookingModal";
 import UserLayout from "@/layouts/UserLayout";
 import {
-  AppShell,
   Container,
   Grid,
   NativeSelect,

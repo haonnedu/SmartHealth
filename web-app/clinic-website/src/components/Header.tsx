@@ -1,4 +1,15 @@
-import { useState } from "react";
+import classes from "@/styles/HeaderTabs.module.css";
+import {
+  Avatar,
+  Burger,
+  Container,
+  Group,
+  Menu,
+  Tabs,
+  Text,
+  UnstyledButton,
+  useMantineTheme,
+} from "@mantine/core";
 import {
   IconChevronDown,
   IconHeart,
@@ -11,21 +22,9 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import cx from "clsx";
-import {
-  Avatar,
-  Burger,
-  Container,
-  Group,
-  Menu,
-  Tabs,
-  Text,
-  UnstyledButton,
-  useMantineTheme,
-} from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import classes from "@/styles/HeaderTabs.module.css";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useState } from "react";
 
 const user = {
   name: "Hao Nguyen",
@@ -42,9 +41,10 @@ const tabs = [
 ];
 export function HeaderTabs() {
   const theme = useMantineTheme();
-  const [opened, { toggle }] = useDisclosure(false);
   const [userMenuOpened, setUserMenuOpened] = useState(false);
   const router = useRouter();
+  const toggleMenu = () => setUserMenuOpened((prev) => !prev);
+  const closeMenu = () => setUserMenuOpened(false);
 
   return (
     <div className={classes.header}>
@@ -55,8 +55,38 @@ export function HeaderTabs() {
               SmartHealth
             </Text>
           </UnstyledButton>
-          <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" />
 
+          {/* Menu for Tab Start */}
+          <Menu
+            width={200}
+            shadow="md"
+            onClose={() => setUserMenuOpened(false)}
+          >
+            <Menu.Target>
+              <Burger
+                opened={userMenuOpened}
+                onClick={toggleMenu}
+                hiddenFrom="xs"
+                size="sm"
+              />
+            </Menu.Target>
+
+            <Menu.Dropdown>
+              {tabs.map((tab) => (
+                <Menu.Item
+                  key={tab.value}
+                  component={Link}
+                  href={`${tab.value}`}
+                  onClick={closeMenu}
+                >
+                  {tab.label}
+                </Menu.Item>
+              ))}
+            </Menu.Dropdown>
+          </Menu>
+          {/* Menu for Tab END */}
+
+          {/* Menu for avatar Start */}
           <Menu
             width={260}
             position="bottom-end"
@@ -149,6 +179,7 @@ export function HeaderTabs() {
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
+          {/* Menu for avatar END */}
         </Group>
       </Container>
       <Container size="xl">
