@@ -18,7 +18,7 @@ export default function BookingPage() {
       {/* Popup booking */}
       <BookingModal opened={opened} onClose={close} />
       {/* Popup booking */}
-      <Container size="xl" p={20}>
+      <Container size="xl" pt={20}>
         <Grid columns={24}>
           <Grid.Col span={{ base: 24, md: 12 }}>
             <Grid>
@@ -51,12 +51,12 @@ export default function BookingPage() {
                   label="Tư vấn trực tiếp "
                   data={["Không", "Có"]}
                 />
-                <Text size="xs" c="dimmed" m={2}>
+                <Text size="xs" c="dimmed" mt={2}>
                   Google Meet sẽ được gửi qua Gmail
                 </Text>
               </Grid.Col>
 
-              <Grid.Col span={12}>
+              <Grid.Col span={12} mt={-10}>
                 <DatePickerInput
                   mt="md"
                   valueFormat="DD/MM/YYYY"

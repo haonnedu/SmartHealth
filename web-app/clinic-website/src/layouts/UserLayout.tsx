@@ -14,7 +14,13 @@ export default function UserLayout({ children }: { children: ReactNode }) {
       </AppShell.Header>
 
       <AppShell.Main className="p-0">
-        <div className="h-[calc(100vh-100px)] overflow-y-auto flex flex-col">
+        <div
+          className="flex flex-col"
+          style={{
+            minHeight: `100vh`,
+            paddingTop: headerHeight,
+          }}
+        >
           <div className="flex-grow p-4">{children}</div>
           <Footer />
         </div>
