@@ -98,7 +98,21 @@ services:
           memory: 256M
     networks:
       - smarthealth_network
-
+  web-app-service:
+    image: ${DOCKER_USERNAME}/smarthealth-web-app-service:latest
+    container_name: web_app_service
+    restart: always
+    depends_on:
+      - postgres-db
+    ports:
+      - "3002:3002"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.3"
+          memory: 256M
+    networks:
+      - smarthealth_network
 volumes:
   pgdata:
 

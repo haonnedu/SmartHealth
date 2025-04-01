@@ -9,20 +9,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Bước 1: Checkout mã nguồn
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # -------------------- BACKEND (identity-service) --------------------
-
-      # Bước 2: Setup JDK
+      # BACKEND (identity-service)
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: "17"
           distribution: "temurin"
 
-      # Bước 3: Cache Maven dependencies
       - name: Cache Maven packages
         uses: actions/cache@v4
         with:
@@ -31,20 +27,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # Bước 4: Build identity-service
       - name: Build identity-service
         working-directory: ./identity-service
         run: mvn clean package -DskipTests
 
-      # -------------------- FRONTEND (clinic-website) --------------------
-
-      # Bước 5: Setup Node.js
+      # FRONTEND (clinic-web)
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      # Bước 6: Cache Node.js modules for clinic-web
       - name: Cache Node.js modules for clinic-web
         uses: actions/cache@v4
         with:
@@ -53,7 +45,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-clinic-web-
 
-      # Bước 7: Build clinic-web
       - name: Build clinic-web
         working-directory: ./web-app/clinic-website
         run: |
@@ -61,9 +52,7 @@ jobs:
           npm ci
           npm run build
 
-      # -------------------- API Gateway --------------------
-
-      # Bước 8: Cache Node.js modules for api-gateway
+      # API Gateway
       - name: Cache Node.js modules for api-gateway
         uses: actions/cache@v4
         with:
@@ -72,43 +61,64 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-api-gateway-
 
-      # Bước 9: Build api-gateway
       - name: Build api-gateway
         working-directory: ./api-gateway
         run: |
           npm ci
           npm run build --if-present
 
-      # -------------------- Docker Push --------------------
+      # BACKEND (web-app-service - NestJS)
+      - name: Cache Node.js modules for web-app-service
+        uses: actions/cache@v4
+        with:
+          path: ./web-app-service/node_modules
+          key: ${{ runner.os }}-node-web-app-service-${{ hashFiles('./web-app-service/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-web-app-service-
 
-      # Bước 10: Log in to Docker Hub
+      - name: Install and build web-app-service
+        working-directory: ./web-app-service
+        run: |
+          yarn install --frozen-lockfile
+          yarn build
+
+      # Docker Hub login
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Bước 11: Build & Push identity-service Docker image
+      # Build & Push images
       - name: Build and push identity-service
         working-directory: ./identity-service
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/smarthealth-identity-service:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/smarthealth-identity-service:latest
+          docker image prune -f
 
-      # Bước 12: Build & Push clinic-web Docker image
       - name: Build and push clinic-web
         working-directory: ./web-app/clinic-website
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/smarthealth-clinic-web:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/smarthealth-clinic-web:latest
+          docker image prune -f
 
-      # Bước 13: Build & Push api-gateway Docker image
       - name: Build and push api-gateway
         working-directory: ./api-gateway
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/smarthealth-api-gateway:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/smarthealth-api-gateway:latest
-      # -------------------- Deploy to Server --------------------
+          docker image prune -f
+
+      - name: Build and push web-app-service
+        working-directory: ./web-app-service
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/smarthealth-web-app-service:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/smarthealth-web-app-service:latest
+          docker image prune -f
+
+      # Deploy to Server
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -118,5 +128,6 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
             cd /root/clinic-management
-            docker-compose pull identity-service clinic-web api-gateway
-            docker-compose up -d --no-deps --force-recreate identity-service clinic-web api-gateway
+            docker-compose pull identity-service clinic-web api-gateway web-app-service
+            docker image prune -f
+            docker-compose up -d --no-deps --force-recreate identity-service clinic-web api-gateway web-app-service
