@@ -76,6 +76,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-web-app-service-
 
+      - name: Set up Node.js for web-app-service
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
       - name: Install and build web-app-service
         working-directory: ./web-app-service
         run: |
