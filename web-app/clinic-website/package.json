@@ -10,10 +10,11 @@
     "gen:api": "node ./node_modules/swagger-typescript-api/dist/cli.cjs generate -p http://localhost:8081/identity/v3/api-docs -o ./src/lib/api/types -n type.gen.ts --axios"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
     "@mantine/carousel": "^7.17.3",
-    "@mantine/core": "^7.17.3",
+    "@mantine/core": "^8.0.0",
     "@mantine/dates": "^7.17.3",
-    "@mantine/hooks": "^7.17.2",
+    "@mantine/hooks": "^8.0.0",
     "@mantine/notifications": "^7.17.3",
     "@tabler/icons-react": "^3.31.0",
     "@tailwindcss/cli": "^4.0.17",
