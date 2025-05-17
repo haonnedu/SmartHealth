@@ -16,8 +16,8 @@ import {
   
     @All('*')
     async proxySwagger(@Req() req: Request, @Res() res: Response) {
-      const targetUrl = `http://localhost:3002/api`;
-  
+        const subPath = req.originalUrl.replace('/api/swagger', '');
+        const targetUrl = `http://localhost:3002/api${subPath || '/'}`;
       try {
         const response = await lastValueFrom(
           this.httpService.request({
