@@ -19,10 +19,8 @@ import {
     async proxySwagger(@Req() req: Request, @Res() res: Response) {
         console.log('[DEBUG] Original URL:', req.originalUrl);
         const subPath = req.originalUrl.replace('/api/swagger', '');
-        const targetUrl = `http://localhost:3002/api${subPath || '/'}`;
-        console.log('[DEBUG] Target URL:', targetUrl);
-        console.log('[DEBUG] Method:', req.method);
-        console.log('[DEBUG] Headers:', req.headers);
+        const targetUrl = `http://web_app_service:3002/api${subPath || '/'}`;
+
 
         try {
             const response = await lastValueFrom(
@@ -31,7 +29,7 @@ import {
                     method: req.method,
                     headers: {
                         ...req.headers,
-                        host: 'localhost:3002'
+                        host: 'web_app_service:3002'
                     },
                     responseType: 'stream',
                 }),
