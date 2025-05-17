@@ -1,9 +1,10 @@
+import AppointmentComponent from "@/components/patient/appointment/appointment.component";
 import PatientLayout from "@/layouts/PatientLayout";
 
-export default function Patient() {
-  return <div>Welcome to Patient Dashboard</div>;
+export default function Appointment() {
+  return <AppointmentComponent />;
 }
 
-Patient.getLayout = (page: React.ReactNode) => (
+Appointment.getLayout = (page: React.ReactNode) => (
   <PatientLayout>{page}</PatientLayout>
 );
