@@ -1,7 +1,16 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Patch,
+  Query,
+} from '@nestjs/common';
 import { AppointmentService } from './appointment.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 
 @ApiTags('Appointment')
 @ApiBearerAuth()
@@ -14,9 +23,22 @@ export class AppointmentController {
     return this.appointmentService.create(dto);
   }
 
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() dto: UpdateAppointmentDto) {
+    return this.appointmentService.update(+id, dto);
+  }
+
   @Get()
-  findAll() {
-    return this.appointmentService.findAll();
+  findAll(
+    @Query('userId') userId: string,
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+  ) {
+    return this.appointmentService.findByFilterWithPaging(
+      userId,
+      +page,
+      +limit,
+    );
   }
 
   @Get(':id')

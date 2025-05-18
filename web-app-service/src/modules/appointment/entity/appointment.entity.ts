@@ -28,4 +28,7 @@ export class Appointment {
 
   @Column({ name: 'alternate_address', nullable: true })
   alternateAddress?: string;
+
+  @Column({ name: 'user_id', nullable: true })
+  userId?: string;
 }

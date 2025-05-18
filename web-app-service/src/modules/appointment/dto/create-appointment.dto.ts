@@ -43,4 +43,9 @@ export class CreateAppointmentDto {
   @IsOptional()
   @IsString()
   alternateAddress?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  userId?: string;
 }

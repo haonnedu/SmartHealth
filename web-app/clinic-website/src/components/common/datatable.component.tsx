@@ -6,12 +6,15 @@ import cx from "clsx";
 import classes from './styles/datatable.module.css';
 
 type DatatableTemplateFn = (value: any, item: any, row: number ) => React.ReactNode;
-
+type DatatableChangePage = (oage: number) => void;
+type DatatableChangePageSize = (oage: number) => void;
 interface DatatableColumn {
   field: string;
   name: string | React.ReactNode;
   algin?: string;
   template?: string | React.ReactNode | DatatableTemplateFn;
+  hidden?: boolean;
+  minWidth?: number;
 }
 
 interface DatatableComponentProps {
@@ -23,6 +26,8 @@ interface DatatableComponentProps {
   isPaging?: boolean;
   totalItems?: number;
   isRowNumber?: boolean;
+  onChangePage?: DatatableChangePage;
+  onChangePageSize?: DatatableChangePageSize;
 }
 
 const renderColumnData = (item: any, col: DatatableColumn, row: number) => {
@@ -48,6 +53,8 @@ const DatatableComponent: React.FC<DatatableComponentProps> = ({
   isPaging,
   totalItems,
   isRowNumber,
+  onChangePage,
+  onChangePageSize,
 }) => {
   if (!columns || columns.length === 0) {
     return <></>;
@@ -63,6 +70,9 @@ const DatatableComponent: React.FC<DatatableComponentProps> = ({
 
   const handleOnChangePage = (value: number) => {
     setPage(value);
+    if (typeof onChangePage === "function") {
+      onChangePage(value);
+    }
   }
 
   const handleOnChangePageSize = (value: string | null) => {
@@ -71,6 +81,9 @@ const DatatableComponent: React.FC<DatatableComponentProps> = ({
       newPageSize = +value;
     }
     setPageSize(newPageSize);
+    if (typeof onChangePageSize === "function") {
+      onChangePageSize(newPageSize);
+    }
   }
 
   return (
@@ -80,13 +93,13 @@ const DatatableComponent: React.FC<DatatableComponentProps> = ({
           <Table.Thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
             <Table.Tr>
               {isRowNumber && <Table.Th className="text-center">STT</Table.Th>}
-              {columns.map((col, index) => <Table.Th className="text-center" key={`${col.field}-${index}`}>{col.field}</Table.Th>)}
+              {columns.filter(item => !item.hidden).map((col, index) => <Table.Th miw={col.minWidth || 50} className="text-center" key={`${col.field}-${index}`}>{col.name}</Table.Th>)}
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
             {(!data || data.length === 0) && (
               <Table.Tr>
-                <Table.Td colSpan={columns.length + (isRowNumber ? 1 : 0)} className="text-center">Không tìm thấy dữ liệu.</Table.Td>
+                <Table.Td colSpan={columns.filter(item =>  !item.hidden).length + (isRowNumber ? 1 : 0)} className="text-center">Không tìm thấy dữ liệu.</Table.Td>
               </Table.Tr>
             )}
 
@@ -94,7 +107,7 @@ const DatatableComponent: React.FC<DatatableComponentProps> = ({
               <>
                 {data.map((item, index) => (
                   <Table.Tr
-                  key={!dataKey ? index : (item[dataKey] || index)}
+                    key={!dataKey ? index : (item[dataKey] || index)}
                   >
                     {isRowNumber && (
                       <Table.Td className="text-center" maw={100}>
@@ -102,8 +115,8 @@ const DatatableComponent: React.FC<DatatableComponentProps> = ({
                         {isPaging && <>{((page - 1) * pageSize) + index + 1}</>}
                       </Table.Td>
                     )}
-                    {columns.map((col) => (
-                      <Table.Td className={`text-${col.algin || 'left'}`}>
+                    {columns.filter(item => !item.hidden).map((col, colIndex) => (
+                      <Table.Td key={`${col.field}-${index}`} className={`text-${col.algin || 'left'}`}>
                         {renderColumnData(item, col, index)}
                       </Table.Td>
                     ))}
@@ -135,7 +148,7 @@ const DatatableComponent: React.FC<DatatableComponentProps> = ({
               <span className="mr-5">Dòng trên mỗi trang: </span>
               <Select
                 maw={80}
-                data={['10', '20', '50']}
+                data={['10', '20', '50', '100']}
                 value={pageSize.toString()}
                 onChange={handleOnChangePageSize}
               />
