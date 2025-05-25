@@ -3,15 +3,17 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { authService, LoginCredentials } from '@/service/auth.service';
+import { authService, RegisterData } from '@/service/auth.service';
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [formData, setFormData] = useState<LoginCredentials>({
-    username: '',
+  const [formData, setFormData] = useState<RegisterData>({
+    email: '',
     password: '',
+    firstName: '',
+    lastName: '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,10 +30,10 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      await authService.login(formData);
-      router.push('/dashboard'); // Redirect to dashboard after successful login
+      await authService.register(formData);
+      router.push('/dashboard'); // Redirect to dashboard after successful registration
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to login. Please try again.');
+      setError(err.response?.data?.message || 'Failed to register. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -42,15 +44,15 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
+            Create your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
+            Already have an account?{' '}
             <Link
-              href="/register"
+              href="/login"
               className="font-medium text-primary hover:text-primary/90"
             >
-              create a new account
+              Sign in
             </Link>
           </p>
         </div>
@@ -63,14 +65,38 @@ export default function LoginPage() {
           )}
 
           <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                id="firstName"
+                name="firstName"
+                type="text"
+                autoComplete="given-name"
+                required
+                placeholder="First name"
+                value={formData.firstName}
+                onChange={handleChange}
+              />
+
+              <Input
+                id="lastName"
+                name="lastName"
+                type="text"
+                autoComplete="family-name"
+                required
+                placeholder="Last name"
+                value={formData.lastName}
+                onChange={handleChange}
+              />
+            </div>
+
             <Input
-              id="username"
-              name="username"
-              type="text"
-              autoComplete="username"
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
               required
-              placeholder="Username"
-              value={formData.username}
+              placeholder="Email address"
+              value={formData.email}
               onChange={handleChange}
             />
 
@@ -78,7 +104,7 @@ export default function LoginPage() {
               id="password"
               name="password"
               type="password"
-              autoComplete="current-password"
+              autoComplete="new-password"
               required
               placeholder="Password"
               value={formData.password}
@@ -93,20 +119,11 @@ export default function LoginPage() {
               size="lg"
               isLoading={isLoading}
             >
-              Sign in
+              Create account
             </Button>
-          </div>
-
-          <div className="text-sm text-center">
-            <Link
-              href="/forgot-password"
-              className="font-medium text-primary hover:text-primary/90"
-            >
-              Forgot your password?
-            </Link>
           </div>
         </form>
       </div>
     </div>
   );
-}
+} 
