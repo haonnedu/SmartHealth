@@ -1,9 +1,18 @@
 package com.smartHealth.identity_service.controller.auth;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartHealth.identity_service.dto.reqeuest.ForgotPasswordRequest;
 import com.smartHealth.identity_service.dto.reqeuest.LoginRequest;
 import com.smartHealth.identity_service.dto.reqeuest.RegisterRequest;
+import com.smartHealth.identity_service.dto.response.LoginResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.core.Response;
@@ -25,12 +34,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@Tag(name = "API Auth", description = "API author management")
+@Tag(name = "Authentication", description = "Authentication endpoints")
 public class AuthController {
     @Value("${keycloak.admin.server-url}")
     private String keycloakServerUrl;
@@ -66,7 +77,25 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Login")
+    @Operation(summary = "Login", description = "Authenticate user and return JWT tokens")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Login successful",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = LoginResponse.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Invalid credentials",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = String.class)
+            )
+        )
+    })
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         String tokenEndpoint = keycloakServerUrl + "/realms/" + realm + "/protocol/openid-connect/token";
 
@@ -84,7 +113,38 @@ public class AuthController {
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(tokenEndpoint, request, String.class);
-            return ResponseEntity.ok(response.getBody()); // JSON include access_token, refresh_token, v.v.
+            // Parse JSON
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(response.getBody());
+
+            String accessToken = jsonNode.get("access_token").asText();
+            String refreshToken = jsonNode.get("refresh_token").asText();
+            String tokenType = jsonNode.get("token_type").asText();
+            long expiresIn = jsonNode.get("expires_in").asLong();
+
+            // Decode JWT to extract user info
+            DecodedJWT decodedJWT = JWT.decode(accessToken);
+            String username = decodedJWT.getClaim("preferred_username").asString();
+            String email = decodedJWT.getClaim("email").asString();
+            String fullName = decodedJWT.getClaim("name").asString();
+
+            List<String> roles = decodedJWT.getClaim("realm_access").asMap() != null
+                    ? (List<String>) ((Map<String, Object>) decodedJWT.getClaim("realm_access").asMap()).get("roles")
+                    : new ArrayList<>();
+
+            // Build response
+            LoginResponse loginResponse = new LoginResponse();
+            loginResponse.setAccessToken(accessToken);
+            loginResponse.setRefreshToken(refreshToken);
+            loginResponse.setTokenType(tokenType);
+            loginResponse.setExpiresIn(expiresIn);
+
+            loginResponse.setUsername(username);
+            loginResponse.setEmail(email);
+            loginResponse.setFullName(fullName);
+            loginResponse.setRoles(roles);
+
+            return ResponseEntity.ok(loginResponse);
         } catch (Exception e) {
             return ResponseEntity.status(401).body("Invalid username or password");
         }

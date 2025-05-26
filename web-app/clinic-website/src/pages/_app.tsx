@@ -1,16 +1,13 @@
 import { MantineProvider } from "@mantine/core";
 import { DatesProvider } from "@mantine/dates";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { AppProps } from "next/app";
+import { QueryProvider } from "@/providers/query-provider";
 
 import "@mantine/carousel/styles.css";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import "dayjs/locale/vi";
 import "../styles/globals.css";
-
-const queryClient = new QueryClient();
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const getLayout =
@@ -24,10 +21,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           firstDayOfWeek: 1,
         }}
       >
-        <QueryClientProvider client={queryClient}>
-          {getLayout(<Component {...pageProps} />)}
-          <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
+        <QueryProvider>{getLayout(<Component {...pageProps} />)}</QueryProvider>
       </DatesProvider>
     </MantineProvider>
   );

@@ -31,7 +31,7 @@ export function middleware(request: NextRequest) {
     const userRole = getUserRoleFromToken(token);
 
     // Check admin routes
-    if (adminPathPattern.test(pathname) && userRole !== 'ADMIN') {
+    if (adminPathPattern.test(pathname) && userRole !== 'admin') {
       return NextResponse.redirect(new URL('/unauthorized', request.url));
     }
 
@@ -54,9 +54,20 @@ function getUserRoleFromToken(token: string): string {
   try {
     const base64Payload = token.split('.')[1];
     const payload = JSON.parse(Buffer.from(base64Payload, 'base64').toString());
-    return payload.role || 'PATIENT'; // Default to PATIENT if no role found
+    
+    // Check realm_access roles first
+    if (payload.realm_access?.roles?.includes('admin')) {
+      return 'admin';
+    }
+
+    // Check resource_access roles
+    if (payload.resource_access?.['realm-management']?.roles?.includes('realm-admin')) {
+      return 'admin'; 
+    }
+
+    return 'user'; // Default to PATIENT if no admin role found
   } catch {
-    return 'PATIENT';
+    return 'user';
   }
 }
 
