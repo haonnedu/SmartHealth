@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { authApi } from "./auth.api";
 import {
   LoginResponse,
+  RegisterData,
   User
 } from "./auth.types";
 
@@ -50,21 +51,21 @@ export const useLogin = () => {
   });
 };
 
-// export const useRegister = () => {
-//   const router = useRouter();
-//   const queryClient = useQueryClient();
+export const useRegister = () => {
+  const router = useRouter();
+  const queryClient = useQueryClient();
 
-//   return useMutation({
-//     mutationFn: authApi.register,
-//     onSuccess: (data: AuthResponse) => {
-//       setAuthToken(data.access_token);
-//       setUserData(data.user);
-//       queryClient.setQueryData(AUTH_KEYS.user, data.user);
-//       queryClient.setQueryData(AUTH_KEYS.token, data.access_token);
-//       router.push("/dashboard");
-//     },
-//   });
-// };
+  return useMutation({
+    mutationFn: authApi.register,
+    onSuccess: (data: RegisterData) => {
+      // setAuthToken(data.);
+      // setUserData(data);
+      // queryClient.setQueryData(AUTH_KEYS.user, data.user);
+      // queryClient.setQueryData(AUTH_KEYS.token, data.access_token);
+      // router.push("/dashboard");
+    },
+  });
+};
 
 export const useLogout = () => {
   const router = useRouter();

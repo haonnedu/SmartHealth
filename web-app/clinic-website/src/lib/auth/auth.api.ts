@@ -10,13 +10,13 @@ export const authApi = {
     return data;
   },
 
-  // register: async (userData: RegisterData): Promise<AuthResponse> => {
-  //   const { data } = await axiosInstance.post<AuthResponse>(
-  //     "/auth/register",
-  //     userData
-  //   );
-  //   return data;
-  // },
+  register: async (userData: RegisterData): Promise<RegisterData> => {
+    const { data } = await axiosInstance.post<RegisterData>(
+      "/auth/register",
+      userData
+    );
+    return data;
+  },
 
   validateToken: async (token: string): Promise<boolean> => {
     try {
