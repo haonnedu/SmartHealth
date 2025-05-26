@@ -2,9 +2,7 @@
 
 <div align="center">
 
-![SmartHealth Logo](https://via.placeholder.com/150x150.png?text=SmartHealth)
-
-[![CI/CD Pipeline](https://github.com/yourusername/smarthealth/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/yourusername/smarthealth/actions/workflows/ci-cd.yml)
+[![CI/CD Pipeline](https://github.com/haonnedu/smarthealth/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/haonnedu/smarthealth/actions/workflows/ci-cd.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat&logo=next.js&logoColor=white)](https://nextjs.org/)
