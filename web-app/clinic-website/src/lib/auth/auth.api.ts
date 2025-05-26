@@ -9,7 +9,7 @@ export const authApi = {
     );
     return data;
   },
-
+  // function to register a new user
   register: async (userData: RegisterData): Promise<RegisterData> => {
     const { data } = await axiosInstance.post<RegisterData>(
       "/auth/register",
