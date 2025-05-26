@@ -20,8 +20,7 @@ export class AuthController {
       const response = await firstValueFrom(
         this.httpService
           .post(
-            // 'https://identity.smarthealth.io.vn/identity/api/auth/login',
-            'http://localhost:8081/identity/api/auth/login',
+            'https://identity.smarthealth.io.vn/identity/api/auth/login',
             body,
           )
           .pipe(
