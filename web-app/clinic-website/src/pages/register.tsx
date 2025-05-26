@@ -1,20 +1,19 @@
-import { useState } from 'react';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { authService, RegisterData } from '@/service/auth.service';
+import { useState } from "react";
+import Link from "next/link";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useRegister } from "@/lib/auth/auth.hooks";
+import { RegisterData } from "@/lib/auth/auth.types";
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
   const [formData, setFormData] = useState<RegisterData>({
-    email: '',
-    password: '',
-    firstName: '',
-    lastName: '',
+    email: "",
+    password: "",
+    firstName: "",
+    lastName: "",
   });
+
+  const register = useRegister();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -26,17 +25,7 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setIsLoading(true);
-
-    try {
-      await authService.register(formData);
-      router.push('/dashboard'); // Redirect to dashboard after successful registration
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to register. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    register.mutate(formData);
   };
 
   return (
@@ -47,20 +36,22 @@ export default function RegisterPage() {
             Create your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Already have an account?{' '}
+            Or{" "}
             <Link
               href="/login"
               className="font-medium text-primary hover:text-primary/90"
             >
-              Sign in
+              sign in to your account
             </Link>
           </p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
+          {register.isError && (
             <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
-              {error}
+              {register.error instanceof Error
+                ? register.error.message
+                : "Failed to register. Please try again."}
             </div>
           )}
 
@@ -70,9 +61,8 @@ export default function RegisterPage() {
                 id="firstName"
                 name="firstName"
                 type="text"
-                autoComplete="given-name"
                 required
-                placeholder="First name"
+                placeholder="First Name"
                 value={formData.firstName}
                 onChange={handleChange}
               />
@@ -81,9 +71,8 @@ export default function RegisterPage() {
                 id="lastName"
                 name="lastName"
                 type="text"
-                autoComplete="family-name"
                 required
-                placeholder="Last name"
+                placeholder="Last Name"
                 value={formData.lastName}
                 onChange={handleChange}
               />
@@ -95,7 +84,7 @@ export default function RegisterPage() {
               type="email"
               autoComplete="email"
               required
-              placeholder="Email address"
+              placeholder="Email"
               value={formData.email}
               onChange={handleChange}
             />
@@ -117,13 +106,13 @@ export default function RegisterPage() {
               type="submit"
               className="w-full"
               size="lg"
-              isLoading={isLoading}
+              disabled={register.isPending}
             >
-              Create account
+              {register.isPending ? "Creating account..." : "Create account"}
             </Button>
           </div>
         </form>
       </div>
     </div>
   );
-} 
+}

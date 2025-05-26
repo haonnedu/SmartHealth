@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "gen:api": "node ./node_modules/swagger-typescript-api/dist/cli.cjs generate -p http://localhost:8081/identity/v3/api-docs -o ./src/lib/api/types -n type.gen.ts --axios"
+    "gen:api:identity": "openapi-typescript http://localhost:8081/identity/v3/api-docs --output ./src/lib/api/types/identity/types.ts",
+    "gen:api:webapp": "openapi-typescript http://localhost:3002/v3/api-docs --output ./src/lib/api/types/webapp/types.ts",
+    "gen:api": "npm run gen:api:identity && npm run gen:api:webapp"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

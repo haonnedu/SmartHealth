@@ -25,25 +25,22 @@ export interface AuthResponse {
 }
 
 class AuthService {
-  async login(credentials: LoginCredentials): Promise<AuthResponse> {
+  async login(credentials: LoginCredentials): Promise<AuthResponse> { 
     debugger
     const response = await axios.post(`${API_URL}/auth/login`, credentials);
     const data = response.data;
-    if (data.access_token) {
+    if (data.accessToken) {
       // Store token in HTTP-only cookie
-      Cookies.set('token', data.access_token, {
-        expires: 7, // 7 days
+      Cookies.set('token', data.accessToken, {
+        expires: 1, // 1 day
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict'
       });
       // Store user data in localStorage (non-sensitive data only)
       localStorage.setItem('user', JSON.stringify({
-        name: data.name,
+        name: data.fullName,
         email: data.email,
-        preferred_username: data.preferred_username,
-        given_name: data.given_name,
-        family_name: data.family_name,
-        role: data.realm_access?.roles?.includes('admin') ? 'ADMIN' : 'PATIENT'
+        role: data.roles[0]
       }));
     }
     return data;

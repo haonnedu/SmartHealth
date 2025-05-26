@@ -1,18 +1,17 @@
-import { useState } from 'react';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { authService, LoginCredentials } from '@/service/auth.service';
+import { useState } from "react";
+import Link from "next/link";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useLogin } from "@/lib/auth/auth.hooks";
+import { LoginCredentials } from "@/lib/auth/auth.types";
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
   const [formData, setFormData] = useState<LoginCredentials>({
-    username: '',
-    password: '',
+    username: "",
+    password: "",
   });
+
+  const login = useLogin();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -24,17 +23,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setIsLoading(true);
-
-    try {
-      await authService.login(formData);
-      router.push('/dashboard'); // Redirect to dashboard after successful login
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to login. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    login.mutate(formData);
   };
 
   return (
@@ -45,7 +34,7 @@ export default function LoginPage() {
             Sign in to your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
+            Or{" "}
             <Link
               href="/register"
               className="font-medium text-primary hover:text-primary/90"
@@ -56,9 +45,11 @@ export default function LoginPage() {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
+          {login.isError && (
             <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
-              {error}
+              {login.error instanceof Error
+                ? login.error.message
+                : "Failed to login. Please try again."}
             </div>
           )}
 
@@ -91,19 +82,10 @@ export default function LoginPage() {
               type="submit"
               className="w-full"
               size="lg"
-              isLoading={isLoading}
+              disabled={login.isPending}
             >
-              Sign in
+              {login.isPending ? "Signing in..." : "Sign in"}
             </Button>
-          </div>
-
-          <div className="text-sm text-center">
-            <Link
-              href="/forgot-password"
-              className="font-medium text-primary hover:text-primary/90"
-            >
-              Forgot your password?
-            </Link>
           </div>
         </form>
       </div>
