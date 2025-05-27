@@ -33,8 +33,7 @@ public class SecurityConfig {
                         .requestMatchers("/users/role/doctor").hasRole("admin")
                         .requestMatchers("/appointments/**").hasRole("doctor")
                         .anyRequest().authenticated()
-                )
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt());
+                );
 
         return http.build();
     }
