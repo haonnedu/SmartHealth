@@ -22,6 +22,7 @@
     "@tailwindcss/cli": "^4.0.17",
     "@tanstack/react-query": "^5.68.0",
     "@tanstack/react-query-devtools": "^5.68.0",
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "20.11.24",
     "@types/react": "18.2.61",
     "@types/react-dom": "18.2.19",
@@ -32,7 +33,6 @@
     "dayjs": "^1.11.13",
     "embla-carousel-react": "^8.5.2",
     "js-cookie": "^3.0.5",
-    "@types/js-cookie": "^3.0.6",
     "lucide-react": "^0.482.0",
     "next": "14.1.1",
     "next-auth": "^4.22.1",
@@ -42,7 +42,8 @@
     "react-toastify": "^11.0.5",
     "tailwind-merge": "^2.2.1",
     "tailwindcss": "3.4.1",
-    "typescript": "5.3.3"
+    "typescript": "5.3.3",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "openapi-typescript": "^7.6.1",

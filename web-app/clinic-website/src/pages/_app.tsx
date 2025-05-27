@@ -2,6 +2,7 @@ import { MantineProvider } from "@mantine/core";
 import { DatesProvider } from "@mantine/dates";
 import type { AppProps } from "next/app";
 import { QueryProvider } from "@/providers/query-provider";
+import LoadingProvider from "@/providers/LoadingProvider";
 
 import "@mantine/carousel/styles.css";
 import "@mantine/core/styles.css";
@@ -14,15 +15,19 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     (Component as any).getLayout || ((page: React.ReactNode) => page);
 
   return (
-    <MantineProvider>
-      <DatesProvider
-        settings={{
-          locale: "en",
-          firstDayOfWeek: 1,
-        }}
-      >
-        <QueryProvider>{getLayout(<Component {...pageProps} />)}</QueryProvider>
-      </DatesProvider>
-    </MantineProvider>
+    <QueryProvider>
+      <MantineProvider>
+        <LoadingProvider>
+          <DatesProvider
+            settings={{
+              locale: "en",
+              firstDayOfWeek: 1,
+            }}
+          >
+            {getLayout(<Component {...pageProps} />)}
+          </DatesProvider>
+        </LoadingProvider>
+      </MantineProvider>
+    </QueryProvider>
   );
 }

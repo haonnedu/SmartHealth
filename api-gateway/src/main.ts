@@ -2,7 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: false,
+  });
   app.enableCors({
     origin: ['http://localhost:3000', 'https://smarthealth.io.vn'], // The domain of your Next.js frontend
     credentials: true, // Important if you use withCredentials

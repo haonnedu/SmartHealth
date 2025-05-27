@@ -1,30 +1,17 @@
 import { Footer } from "@/components/Footer";
-import { HeaderTabs } from "@/components/Header";
-import { AppShell } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
+import MainHeader from "@/components/Header";
 import { ReactNode } from "react";
 
 export default function UserLayout({ children }: { children: ReactNode }) {
-  const isMobile = useMediaQuery("(max-width: 768px)");
-  const headerHeight = isMobile ? 60 : 100;
   return (
-    <AppShell header={{ height: 100 }} padding={0}>
-      <AppShell.Header>
-        <HeaderTabs />
-      </AppShell.Header>
-
-      <AppShell.Main className="p-0">
-        <div
-          className="flex flex-col"
-          style={{
-            minHeight: `100vh`,
-            paddingTop: headerHeight,
-          }}
-        >
-          <div className="flex-grow p-4">{children}</div>
-          <Footer />
-        </div>
-      </AppShell.Main>
-    </AppShell>
+    <div className="min-h-screen flex flex-col">
+      {/* Fixed Header */}
+      <div className="fixed top-0 left-0 w-full z-50 bg-white shadow-md">
+        <MainHeader />
+      </div>
+      {/* Main Content with increased top padding */}
+      <main className="flex-1 pt-[112px] bg-white">{children}</main>
+      <Footer />
+    </div>
   );
 }
