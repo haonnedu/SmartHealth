@@ -2,16 +2,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 import { authApi } from "./auth.api";
-import {
-  LoginResponse,
-  RegisterData,
-  User
-} from "./auth.types";
-
-const AUTH_KEYS = {
-  user: ["auth", "user"] as const,
-  token: ["auth", "token"] as const,
-};
+import { LoginResponse, RegisterData, User } from "./auth.types";
+import { AUTH_KEYS } from "./auth.keys";
 
 // Helper functions for token management
 const setAuthToken = (token: any) => {
@@ -44,7 +36,12 @@ export const useLogin = () => {
     onSuccess: (data: LoginResponse) => {
       setAuthToken(data.accessToken);
       setUserData(data);
-      queryClient.setQueryData(AUTH_KEYS.user, data);
+      queryClient.setQueryData(AUTH_KEYS.user, {
+        username: data.username,
+        email: data.email,
+        fullName: data.fullName,
+        roles: data.roles,
+      });
       queryClient.setQueryData(AUTH_KEYS.token, data.accessToken);
       router.push("/dashboard");
     },

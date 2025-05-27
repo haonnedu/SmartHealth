@@ -20,7 +20,7 @@ export const authApi = {
 
   validateToken: async (token: string): Promise<boolean> => {
     try {
-      await axiosInstance.get("/auth/validate", {
+      await axiosInstance.post("/auth/validate",{}, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return true;
@@ -34,5 +34,12 @@ export const authApi = {
       headers: { Authorization: `Bearer ${token}` },
     });
     return data;
+  },
+
+  refreshToken: async (refreshToken: string) => {
+    const { data } = await axiosInstance.post("/auth/refresh", {
+    headers: { Authorization: `Bearer ${refreshToken}` },
+  });
+  return data;
   },
 };
