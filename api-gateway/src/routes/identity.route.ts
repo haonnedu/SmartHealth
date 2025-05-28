@@ -40,7 +40,7 @@ export class AuthController {
       }
 
       const response = await firstValueFrom(
-        this.httpService.get('http://localhost:8081/identity/api/auth/validate', {
+        this.httpService.get('https://identity.smarthealth.io.vn/identity/api/auth/validate', {
           headers: { Authorization: authHeader }
         }).pipe(
           catchError((error) => {
