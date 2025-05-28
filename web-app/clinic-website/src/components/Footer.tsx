@@ -1,64 +1,105 @@
 // components/Footer.tsx
-import { Container, Grid, Text, Anchor, Divider, Group } from "@mantine/core";
+import {
+  Container,
+  Grid,
+  Text,
+  Title,
+  Stack,
+  Group,
+  ActionIcon,
+} from "@mantine/core";
+import {
+  IconBrandTwitter,
+  IconBrandYoutube,
+  IconBrandInstagram,
+} from "@tabler/icons-react";
+import Link from "next/link";
+
+const footerData = [
+  {
+    title: "Company",
+    links: [
+      { label: "About Us", href: "/about" },
+      { label: "Careers", href: "/careers" },
+      { label: "Press", href: "/press" },
+      { label: "Blog", href: "/blog" },
+    ],
+  },
+  {
+    title: "Services",
+    links: [
+      { label: "General Checkup", href: "/services/general-checkup" },
+      { label: "Specialty Clinics", href: "/services/specialty-clinics" },
+      { label: "Online Consultation", href: "/services/online-consultation" },
+      { label: "Home Lab Tests", href: "/services/home-lab-tests" },
+    ],
+  },
+  {
+    title: "Support",
+    links: [
+      { label: "Help Center", href: "/help" },
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms of Service", href: "/terms" },
+      { label: "Contact Us", href: "/contact" },
+    ],
+  },
+];
 
 export function Footer() {
   return (
-    <footer className="bg-gray-100">
-      <Divider my="md" />
-      <Container size="xl" py="md">
+    <footer className="bg-gray-50 border-t border-gray-200 py-12 mt-auto">
+      <Container size="xl">
         <Grid>
-          <Grid.Col span={{ base: 12, sm: 6 }}>
-            <Text fw={700} size="lg">
-              SmartHealth
-            </Text>
-            <Text size="sm" c="dimmed" mt="xs">
-              Khám bệnh dễ dàng – An toàn – Nhanh chóng
-            </Text>
-            <Text size="sm" c="dimmed">
-              Easy – Safe – Fast Health Checkup
-            </Text>
+          {/* Brand and Description */}
+          <Grid.Col span={{ base: 12, md: 3 }}>
+            <Stack>
+              <Title order={4} className="text-pink-700">
+                SmartHealth
+              </Title>
+              <Text size="sm" c="dimmed" className="max-w-xs">
+                Empowering healthcare through innovative technology solutions
+                for a healthier tomorrow.
+              </Text>
+              {/* Social Links */}
+              <Group gap="xs" mt="md">
+                <ActionIcon size="lg" variant="light" radius="xl" color="pink">
+                  <IconBrandTwitter size={18} />
+                </ActionIcon>
+                <ActionIcon size="lg" variant="light" radius="xl" color="pink">
+                  <IconBrandYoutube size={18} />
+                </ActionIcon>
+                <ActionIcon size="lg" variant="light" radius="xl" color="pink">
+                  <IconBrandInstagram size={18} />
+                </ActionIcon>
+              </Group>
+            </Stack>
           </Grid.Col>
 
-          <Grid.Col span={{ base: 12, sm: 3 }}>
-            <Text fw={600} mb="xs">
-              Liên kết / Links
-            </Text>
-            <Anchor href="/booking" size="sm">
-              Đặt lịch khám
-            </Anchor>
-            <Anchor href="/guide" size="sm">
-              Hướng dẫn
-            </Anchor>
-            <Anchor href="/contact" size="sm">
-              Liên hệ
-            </Anchor>
-          </Grid.Col>
-
-          <Grid.Col span={{ base: 12, sm: 3 }}>
-            <Text fw={600} mb="xs">
-              Liên hệ / Contact
-            </Text>
-            <Text size="sm">Hotline: 1900 6868</Text>
-            <Text size="sm">Email: support@smarthealth.vn</Text>
-            <Text size="sm">Địa chỉ: 123 Lê Lợi, TP.HCM</Text>
-          </Grid.Col>
+          {/* Footer Links */}
+          {footerData.map((group) => (
+            <Grid.Col key={group.title} span={{ base: 12, md: 3 }}>
+              <Stack>
+                <Title order={5}>{group.title}</Title>
+                <Stack gap="xs">
+                  {group.links.map((link) => (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      className="text-gray-600 hover:text-pink-700 transition-colors text-sm"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </Stack>
+              </Stack>
+            </Grid.Col>
+          ))}
         </Grid>
 
-        <Divider my="md" />
-
-        <Group justify="space-between">
-          <Text size="xs" c="dimmed">
-            © {new Date().getFullYear()} SmartHealth. All rights reserved.
-          </Text>
-          <Group gap="xs">
-            <Anchor href="/terms" size="xs">
-              Điều khoản
-            </Anchor>
-            <Anchor href="/privacy" size="xs">
-              Chính sách bảo mật
-            </Anchor>
-          </Group>
-        </Group>
+        {/* Bottom Bar */}
+        <Text c="dimmed" size="sm" ta="center" mt={50}>
+          © {new Date().getFullYear()} SmartHealth. All rights reserved.
+        </Text>
       </Container>
     </footer>
   );

@@ -1,8 +1,8 @@
-import { MantineProvider } from "@mantine/core";
 import { DatesProvider } from "@mantine/dates";
 import type { AppProps } from "next/app";
 import { QueryProvider } from "@/providers/query-provider";
 import LoadingProvider from "@/providers/LoadingProvider";
+import { ThemeProvider } from "@/providers/ThemeProvider";
 
 import "@mantine/carousel/styles.css";
 import "@mantine/core/styles.css";
@@ -16,7 +16,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <QueryProvider>
-      <MantineProvider>
+      <ThemeProvider>
         <LoadingProvider>
           <DatesProvider
             settings={{
@@ -27,7 +27,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             {getLayout(<Component {...pageProps} />)}
           </DatesProvider>
         </LoadingProvider>
-      </MantineProvider>
+      </ThemeProvider>
     </QueryProvider>
   );
 }

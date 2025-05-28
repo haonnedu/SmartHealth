@@ -1,3 +1,52 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+/* Add smooth transitions for color changes */
+* {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* Exclude certain elements from transition */
+.no-transition,
+.no-transition * {
+  transition: none !important;
+}
+
+/* Smooth gradient transitions */
+.bg-gradient-to-r,
+.bg-gradient-to-br {
+  background-size: 200% 200%;
+  transition: background-position 0.6s ease;
+}
+
+.bg-gradient-to-r:hover,
+.bg-gradient-to-br:hover {
+  background-position: 100% 50%;
+}
+
+/* Theme change animation */
+@keyframes themeChange {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.theme-transition {
+  animation: themeChange 0.3s ease-out;
+}
