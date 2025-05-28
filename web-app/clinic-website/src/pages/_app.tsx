@@ -18,14 +18,14 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     <QueryProvider>
       <ThemeProvider>
         <LoadingProvider>
-          <DatesProvider
-            settings={{
-              locale: "en",
-              firstDayOfWeek: 1,
-            }}
-          >
-            {getLayout(<Component {...pageProps} />)}
-          </DatesProvider>
+      <DatesProvider
+        settings={{
+          locale: "en",
+          firstDayOfWeek: 1,
+        }}
+      >
+          {getLayout(<Component {...pageProps} />)}
+      </DatesProvider>
         </LoadingProvider>
       </ThemeProvider>
     </QueryProvider>

@@ -542,8 +542,8 @@ export default function BookingPage() {
                       </Text>
                     </Group>
 
-                    <Grid>
-                      <Grid.Col span={{ base: 12, md: 6 }}>
+            <Grid>
+              <Grid.Col span={{ base: 12, md: 6 }}>
                         <TextInput
                           label="First Name"
                           placeholder="Enter your first name"
@@ -584,9 +584,9 @@ export default function BookingPage() {
                           onChange={(e) =>
                             setFormData({ ...formData, email: e.target.value })
                           }
-                        />
-                      </Grid.Col>
-                      <Grid.Col span={{ base: 12, md: 6 }}>
+                />
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 6 }}>
                         <TextInput
                           label="Phone Number"
                           placeholder="Enter your phone number"
@@ -597,9 +597,9 @@ export default function BookingPage() {
                           onChange={(e) =>
                             setFormData({ ...formData, phone: e.target.value })
                           }
-                        />
-                      </Grid.Col>
-                      <Grid.Col span={{ base: 12, md: 6 }}>
+                />
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 6 }}>
                         <TextInput
                           label="Password"
                           type="password"
@@ -614,9 +614,9 @@ export default function BookingPage() {
                               password: e.target.value,
                             })
                           }
-                        />
-                      </Grid.Col>
-                      <Grid.Col span={{ base: 12, md: 6 }}>
+                />
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 6 }}>
                         <TextInput
                           label="Confirm Password"
                           type="password"
@@ -670,7 +670,7 @@ export default function BookingPage() {
                           }
                           size="md"
                         />
-                      </Grid.Col>
+              </Grid.Col>
                       <Grid.Col span={12}>
                         <TextInput
                           label="Reason for Visit"
@@ -681,10 +681,10 @@ export default function BookingPage() {
                           onChange={(e) =>
                             setFormData({ ...formData, reason: e.target.value })
                           }
-                        />
-                      </Grid.Col>
-                      <Grid.Col span={12}>
-                        <Textarea
+                />
+              </Grid.Col>
+              <Grid.Col span={12}>
+                <Textarea
                           label="Medical History (Optional)"
                           placeholder="Any relevant medical history or current medications"
                           minRows={3}
@@ -695,9 +695,9 @@ export default function BookingPage() {
                               medicalHistory: e.target.value,
                             })
                           }
-                        />
-                      </Grid.Col>
-                      <Grid.Col span={12}>
+                />
+              </Grid.Col>
+              <Grid.Col span={12}>
                         <Textarea
                           label="Additional Notes"
                           placeholder="Any additional information you'd like to share"
@@ -747,8 +747,8 @@ export default function BookingPage() {
                             </label>
                           </Group>
                         </Card>
-                      </Grid.Col>
-                    </Grid>
+              </Grid.Col>
+            </Grid>
 
                     <Text size="sm" c="dimmed" mt="md">
                       Already have an account?{" "}
@@ -760,7 +760,7 @@ export default function BookingPage() {
                       >
                         Sign in
                       </Button>
-                    </Text>
+                </Text>
                   </Card>
                 )}
               </Card>
@@ -816,7 +816,7 @@ export default function BookingPage() {
                 </Button>
               )}
             </Group>
-          </Grid.Col>
+              </Grid.Col>
 
           {/* Sidebar */}
           <Grid.Col span={{ base: 12, lg: 4 }}>
