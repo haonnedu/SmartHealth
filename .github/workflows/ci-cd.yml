@@ -101,8 +101,8 @@ jobs:
       - name: Build and push identity-service
         working-directory: ./identity-service
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/smarthealth-identity-service:latest .
-          docker push ${{ secrets.DOCKER_USERNAME }}/smarthealth-identity-service:latest
+          docker build -t smarthealth/smarthealth-identity-service:latest .
+          docker push smarthealth/smarthealth-identity-service:latest
           docker image prune -f
 
       - name: Build and push clinic-web
@@ -110,27 +110,29 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          docker build --build-arg OPENAI_API_KEY=$OPENAI_API_KEY -t ${{ secrets.DOCKER_USERNAME }}/smarthealth-clinic-web:latest .
-          docker push ${{ secrets.DOCKER_USERNAME }}/smarthealth-clinic-web:latest
+          docker build --build-arg OPENAI_API_KEY=$OPENAI_API_KEY -t smarthealth/smarthealth-clinic-web:latest .
+          docker push smarthealth/smarthealth-clinic-web:latest
           docker image prune -f
 
       - name: Build and push api-gateway
         working-directory: ./api-gateway
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/smarthealth-api-gateway:latest .
-          docker push ${{ secrets.DOCKER_USERNAME }}/smarthealth-api-gateway:latest
+          docker build -t smarthealth/smarthealth-api-gateway:latest .
+          docker push smarthealth/smarthealth-api-gateway:latest
           docker image prune -f
 
       - name: Build and push web-app-service
         working-directory: ./web-app-service
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/smarthealth-web-app-service:latest .
-          docker push ${{ secrets.DOCKER_USERNAME }}/smarthealth-web-app-service:latest
+          docker build -t smarthealth/smarthealth-web-app-service:latest .
+          docker push smarthealth/smarthealth-web-app-service:latest
           docker image prune -f
 
       # Deploy to Server
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         with:
           host: 103.166.183.74
           username: root
@@ -139,6 +141,7 @@ jobs:
           envs: OPENAI_API_KEY
           script: |
             cd /root/clinic-management
+            echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
             docker-compose pull identity-service clinic-web api-gateway web-app-service
             docker image prune -f
             docker-compose up -d --no-deps --force-recreate identity-service clinic-web api-gateway web-app-service
