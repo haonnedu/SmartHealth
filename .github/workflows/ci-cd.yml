@@ -141,9 +141,6 @@ jobs:
           envs: OPENAI_API_KEY
           script: |
             cd /root/clinic-management
-            # Ensure environment variable is set in the server
-            echo "OPENAI_API_KEY=$OPENAI_API_KEY" >> .env
-            export OPENAI_API_KEY="$OPENAI_API_KEY"
             docker-compose pull identity-service clinic-web api-gateway web-app-service
             docker image prune -f
             docker-compose up -d --no-deps --force-recreate identity-service clinic-web api-gateway web-app-service
