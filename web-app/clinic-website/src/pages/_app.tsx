@@ -3,6 +3,7 @@ import type { AppProps } from "next/app";
 import { QueryProvider } from "@/providers/query-provider";
 import LoadingProvider from "@/providers/LoadingProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
+import { ChatBotProvider } from "@/components/ChatBot/ChatBotProvider";
 
 import "@mantine/carousel/styles.css";
 import "@mantine/core/styles.css";
@@ -18,14 +19,16 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     <QueryProvider>
       <ThemeProvider>
         <LoadingProvider>
-      <DatesProvider
-        settings={{
-          locale: "en",
-          firstDayOfWeek: 1,
-        }}
-      >
-          {getLayout(<Component {...pageProps} />)}
-      </DatesProvider>
+          <DatesProvider
+            settings={{
+              locale: "en",
+              firstDayOfWeek: 1,
+            }}
+          >
+            <ChatBotProvider>
+              {getLayout(<Component {...pageProps} />)}
+            </ChatBotProvider>
+          </DatesProvider>
         </LoadingProvider>
       </ThemeProvider>
     </QueryProvider>

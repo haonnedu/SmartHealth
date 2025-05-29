@@ -47,8 +47,11 @@ jobs:
 
       - name: Build clinic-web
         working-directory: ./web-app/clinic-website
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           echo "NEXT_PUBLIC_API_URL=https://api.smarthealth.io.vn/api" > .env.production
+          echo "OPENAI_API_KEY=$OPENAI_API_KEY" >> .env.production
           npm ci
           npm run build
 
@@ -126,13 +129,17 @@ jobs:
       # Deploy to Server
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         with:
           host: 103.166.183.74
           username: root
           port: 24700
           password: ${{ secrets.SERVER_PASSWORD }}
+          envs: OPENAI_API_KEY
           script: |
             cd /root/clinic-management
+            export OPENAI_API_KEY="$OPENAI_API_KEY"
             docker-compose pull identity-service clinic-web api-gateway web-app-service
             docker image prune -f
             docker-compose up -d --no-deps --force-recreate identity-service clinic-web api-gateway web-app-service

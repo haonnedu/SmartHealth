@@ -20,7 +20,7 @@ import {
   Stack,
   Stepper,
   Text,
-  Title
+  Title,
 } from "@mantine/core";
 import {
   IconAward,
@@ -37,7 +37,7 @@ import {
   IconShield,
   IconStar,
   IconStethoscope,
-  IconUsers
+  IconUsers,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { useEffect } from "react";
