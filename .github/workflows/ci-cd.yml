@@ -131,8 +131,6 @@ jobs:
       # Deploy to Server
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         with:
           host: 103.166.183.74
           username: root
