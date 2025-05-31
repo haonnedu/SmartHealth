@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppointmentModule } from './modules/appointment/appointment.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { TypeOrmConfig } from './config/typeorm.config';
+import { MasterDataModule } from './modules/master-data/master-data.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { TypeOrmConfig } from './config/typeorm.config';
     }),
     AppointmentModule,
     AuthModule,
+    MasterDataModule,
   ],
 })
 export class AppModule {}
