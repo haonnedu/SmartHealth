@@ -1,5 +1,5 @@
 export default interface Paging<T> {
-  data: T[];
+  items: T[];
   totalItems: number;
   page: number;
   limit: number;

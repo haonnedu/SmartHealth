@@ -6,6 +6,8 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+  --pagination-active-color: var(--mantine-primary-color-filled);
+  --datatable-selected-color: var(--mantine-primary-color-filled);
 }
 
 /* Add smooth transitions for color changes */

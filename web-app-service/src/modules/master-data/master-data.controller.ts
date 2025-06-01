@@ -44,14 +44,14 @@ export class MasterDataController {
 
   @Get('/findSubMasterDataByFilterWithPaging')
   findSubMasterDataByFilterWithPaging(
-    @Query('massterCode') massterCode: string,
+    @Query('masterCode') masterCode: string,
     @Query('code') code: string,
     @Query('name') name: string,
     @Query('page') page: string,
     @Query('limit') limit: string,
   ) {
     return this.masterDataService.findSubMasterDataByFilterWithPaging(
-      massterCode,
+      masterCode,
       code,
       name,
       +page,

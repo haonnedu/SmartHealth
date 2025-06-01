@@ -30,7 +30,7 @@ export default function AppointmentListComponent() {
     });
     if (status === 200) {
       setTotalItems(data.totalItems);
-      setAppointments(data.data);
+      setAppointments(data.items);
     } else {
       console.error('Something was wrong when loading appointments');
     }

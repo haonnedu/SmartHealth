@@ -5,6 +5,7 @@ export class SubData {
   @Column({
     length: 20,
     nullable: false,
+    primary: true,
     name: 'master_data_code',
   })
   masterDataCode: string;
@@ -12,6 +13,7 @@ export class SubData {
   @Column({
     length: 20,
     nullable: false,
+    primary: true,
     name: 'sub_data_code',
   })
   subDataCode: string;
