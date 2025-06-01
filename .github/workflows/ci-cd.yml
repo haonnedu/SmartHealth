@@ -49,7 +49,7 @@ jobs:
         working-directory: ./web-app/clinic-website
         run: |
           echo "NEXT_PUBLIC_API_URL=https://api.smarthealth.io.vn/api" > .env.production
-          npm ci
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env.production  
           npm run build
 
       # API Gateway

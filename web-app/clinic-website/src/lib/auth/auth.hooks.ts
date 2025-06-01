@@ -43,7 +43,7 @@ export const useLogin = () => {
         roles: data.roles,
       });
       queryClient.setQueryData(AUTH_KEYS.token, data.accessToken);
-      router.push("/dashboard");
+      router.push("/");
     },
   });
 };

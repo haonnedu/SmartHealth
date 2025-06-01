@@ -9,13 +9,13 @@ export default function UserLayout({ children }: { children: ReactNode }) {
       {/* Fixed Header */}
       <Box
         className="fixed top-0 left-0 w-full z-50"
-          style={{
+        style={{
           backgroundColor: "rgba(255, 255, 255, 0.9)",
           backdropFilter: "blur(10px)",
           boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
           borderBottom: "1px solid #e5e7eb",
-          }}
-        >
+        }}
+      >
         <MainHeader />
       </Box>
 
@@ -27,7 +27,7 @@ export default function UserLayout({ children }: { children: ReactNode }) {
       </Box>
 
       {/* Footer */}
-          <Footer />
+      <Footer />
     </Box>
   );
 }

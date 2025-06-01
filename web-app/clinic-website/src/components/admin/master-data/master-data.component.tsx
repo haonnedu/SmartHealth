@@ -1,6 +1,7 @@
 "use client";
 
 import { Grid } from "@mantine/core";
+
 import MasterDataListComponent from "./master-data-list.component";
 import SubDataComponent from "./sub-data-list.component";
 import { useState } from "react";

@@ -779,7 +779,7 @@ export default function BookingPage() {
 
               {currentStep < 3 ? (
                 <Button
-                  variant="filled"
+                  variant="outline"
                   color={tenantTheme.primaryColor}
                   onClick={handleNext}
                   disabled={

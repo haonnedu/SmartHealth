@@ -75,6 +75,7 @@ services:
     environment:
       NODE_ENV: production
       NEXT_PUBLIC_API_URL: https://api.smarthealth.io.vn/api
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
     ports:
       - "3000:3000"
     deploy:
