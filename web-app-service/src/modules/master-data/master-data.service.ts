@@ -44,11 +44,13 @@ export class MasterDataService {
   }> {
     if (!page) page = 1;
     if (!limit) limit = 20;
+    if (!code) code = '';
+    if (!name) name = '';
 
     const [data, total] = await this.masterDataRespository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
-      order: { sortNo: 'DESC' },
+      order: { sortNo: 'ASC' },
       where: {
         masterDataCode: ILike(`%${code}%`),
         masterDataName: ILike(`%${name}%`),
@@ -81,11 +83,13 @@ export class MasterDataService {
 
     if (!page) page = 1;
     if (!limit) limit = 20;
+    if (!code) code = '';
+    if (!name) name = '';
 
     const [data, total] = await this.subDataRespository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
-      order: { sortNo: 'DESC' },
+      order: { sortNo: 'ASC' },
       where: {
         masterDataCode: masterCode,
         subDataCode: ILike(`%${code}%`),
