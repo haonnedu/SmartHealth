@@ -16,6 +16,8 @@ interface DatatableColumn {
   template?: string | React.ReactNode | DatatableTemplateFn;
   hidden?: boolean;
   minWidth?: number;
+  maxWidth?: number;
+  width?: number;
 }
 
 interface DatatableComponentProps {
@@ -117,8 +119,8 @@ const DatatableComponent: React.FC<DatatableComponentProps> = ({
         <Table miw={minWight || 700} highlightOnHover withColumnBorders>
           <Table.Thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
             <Table.Tr>
-              {isRowNumber && <Table.Th maw={10} className="text-center">STT</Table.Th>}
-              {columns.filter(item => !item.hidden).map((col, index) => <Table.Th miw={col.minWidth || 50} className="text-center" key={`${col.field}-${index}`}>{col.name}</Table.Th>)}
+              {isRowNumber && <Table.Th w={50} className="text-center">STT</Table.Th>}
+              {columns.filter(item => !item.hidden).map((col, index) => <Table.Th miw={col.minWidth || 50} style={{ width: col.width || "auto" }} className="text-center" key={`${col.field}-${index}`}>{col.name}</Table.Th>)}
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
