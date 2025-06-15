@@ -21,7 +21,16 @@ export class MasterDataService {
     private readonly subDataRespository: Repository<SubData>,
   ) {}
 
-  createMasterData(createMasterDatumDto: CreateMasterDataDto) {
+  async createMasterData(createMasterDatumDto: CreateMasterDataDto) {
+    // Check if master data with the same code already exists
+    const existingMasterData = await this.masterDataRespository.findOne({
+      where: { masterDataCode: createMasterDatumDto.masterDataCode },
+    });
+    if (existingMasterData) {
+      throw new BadRequestException(
+        `Mã loại dữ liệu ${createMasterDatumDto.masterDataCode} đã tồn tại.`,
+      );
+    }
     const masterData = this.masterDataRespository.create(createMasterDatumDto);
     return this.masterDataRespository.save(masterData);
   }

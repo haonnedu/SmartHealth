@@ -10,6 +10,10 @@ import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import "dayjs/locale/vi";
 import "../styles/globals.css";
+import '@mantine/notifications/styles.css';
+import { MantineProvider } from "@mantine/core";
+import { Notifications } from '@mantine/notifications';
+import { ModalsProvider } from '@mantine/modals';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const getLayout =
@@ -25,9 +29,20 @@ export default function MyApp({ Component, pageProps }: AppProps) {
               firstDayOfWeek: 1,
             }}
           >
-            <ChatBotProvider>
-              {getLayout(<Component {...pageProps} />)}
-            </ChatBotProvider>
+            <MantineProvider>
+              <Notifications
+                position="top-right"
+                autoClose={5000}
+                zIndex={2077}
+                transitionDuration={200}
+                limit={5}
+              />
+              <ModalsProvider>
+                <ChatBotProvider>
+                  {getLayout(<Component {...pageProps} />)}
+                </ChatBotProvider>
+              </ModalsProvider>
+            </MantineProvider>
           </DatesProvider>
         </LoadingProvider>
       </ThemeProvider>
