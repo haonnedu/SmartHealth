@@ -44,7 +44,7 @@ keycloak:
   public-client: true
   bearer-only: false
   client-id: gateway-local
-  client-secret: sGEUrF63LZ7nT9m2CzHPb7i8kp960A5i
+  client-secret: rxqovD1MUxvv46XYlb3dlIULsCsYGtTq
   username: admin
   password: admin123
 logging:

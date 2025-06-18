@@ -1,5 +1,7 @@
+version: "3.8"
+
 services:
-  postgres-db:
+  postgres_identity:
     image: postgres:15
     container_name: postgres_identity
     restart: always
@@ -22,9 +24,10 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     container_name: keycloak
+    restart: always
     environment:
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres-db:5432/identity_service
+      KC_DB_URL: jdbc:postgresql://postgres_identity:5432/identity_service
       KC_DB_USERNAME: identity_admin
       KC_DB_PASSWORD: MyStrongPassword456@
       KEYCLOAK_ADMIN: admin
@@ -36,22 +39,21 @@ services:
       - --http-port=8080
       - --http-enabled=true
       - --proxy=edge
+    depends_on:
+      - postgres_identity
     ports:
       - "8080:8080"
-    depends_on:
-      - postgres-db
     networks:
       - smarthealth_network
-    restart: always
 
-  identity-service:
+  identity_service:
     image: ${DOCKER_USERNAME}/smarthealth-identity-service:latest
     container_name: identity_service
     restart: always
     depends_on:
-      - postgres-db
+      - postgres_identity
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/identity_service
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_identity:5432/identity_service
       SPRING_DATASOURCE_USERNAME: identity_admin
       SPRING_DATASOURCE_PASSWORD: MyStrongPassword456@
     ports:
@@ -64,14 +66,14 @@ services:
     networks:
       - smarthealth_network
 
-  clinic-web:
+  clinic_web:
     image: ${DOCKER_USERNAME}/smarthealth-clinic-web:latest
     container_name: clinic_web
     restart: always
     depends_on:
-      - postgres-db
+      - postgres_identity
       - keycloak
-      - identity-service
+      - identity_service
     environment:
       NODE_ENV: production
       NEXT_PUBLIC_API_URL: https://api.smarthealth.io.vn/api
@@ -85,12 +87,13 @@ services:
           memory: 256M
     networks:
       - smarthealth_network
-  api-gateway:
+
+  api_gateway:
     image: ${DOCKER_USERNAME}/smarthealth-api-gateway:latest
     container_name: api_gateway
     restart: always
     depends_on:
-      - identity-service
+      - identity_service
     ports:
       - "3001:3001"
     deploy:
@@ -100,12 +103,13 @@ services:
           memory: 256M
     networks:
       - smarthealth_network
-  web-app-service:
+
+  web_app_service:
     image: ${DOCKER_USERNAME}/smarthealth-web-app-service:latest
     container_name: web_app_service
     restart: always
     depends_on:
-      - postgres-db
+      - postgres_identity
     ports:
       - "3002:3002"
     deploy:
@@ -115,6 +119,7 @@ services:
           memory: 256M
     networks:
       - smarthealth_network
+
 volumes:
   pgdata:
 

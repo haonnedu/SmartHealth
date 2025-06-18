@@ -50,6 +50,7 @@ jobs:
         run: |
           echo "NEXT_PUBLIC_API_URL=https://api.smarthealth.io.vn/api" > .env.production
           echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env.production  
+          npm ci
           npm run build
 
       # API Gateway
@@ -133,6 +134,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
             cd /root/clinic-management
-            docker-compose pull identity-service clinic-web api-gateway web-app-service
+            docker-compose pull identity_service clinic_web api_gateway web_app_service
             docker image prune -f
-            docker-compose up -d --no-deps --force-recreate identity-service clinic-web api-gateway web-app-service
+            docker-compose up -d --no-deps --force-recreate identity_service clinic_web api_gateway web_app_service
+

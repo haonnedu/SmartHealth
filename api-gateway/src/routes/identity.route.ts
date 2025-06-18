@@ -18,8 +18,8 @@ export class AuthController {
   @Get('refresh')
   async refresh(@Body() body: any) {
     return this.httpService.get(
-      // 'https://identity.smarthealth.io.vn/identity/api/auth/refresh',
-      'http://localhost:8081/identity/api/auth/refresh',
+      'https://identity.smarthealth.io.vn/identity/api/auth/refresh',
+      // 'http://localhost:8081/identity/api/auth/refresh',
       {
         headers: {
           Authorization: `Bearer ${body.refreshToken}`,
