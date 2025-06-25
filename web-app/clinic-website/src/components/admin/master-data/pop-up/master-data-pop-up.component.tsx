@@ -38,6 +38,7 @@ const MasterDataPopUp: React.FC<MasterDataPopUpProps> = ({
       subDataDataCodeLength: data?.subDataDataCodeLength || 20,
     },
     validate: {
+
       masterDataCode: (value: string) => {
         if (!value) return "Mã loại dữ liệu không được để trống";
         if (value.length > 20) return "Mã loại dữ liệu không được quá 20 ký tự";
