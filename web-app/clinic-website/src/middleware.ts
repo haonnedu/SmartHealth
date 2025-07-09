@@ -17,67 +17,70 @@ const patientPathPattern = /^\/patient.*/; // Matches any path starting with /pa
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow access to public paths
-  if (publicPaths.includes(pathname)) {
-    return NextResponse.next();
-  }
+  // // Allow access to public paths
+  // if (publicPaths.includes(pathname)) {
+  //   return NextResponse.next();
+  // }
 
-  // Get the token from the cookies
-  const token = request.cookies.get("token")?.value;
+  // // Get the token from the cookies
+  // const token = request.cookies.get("token")?.value;
 
-  // If no token is present, redirect to login
-  if (!token) {
-    const url = new URL("/login", request.url);
-    url.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(url);
-  }
+  // // If no token is present, redirect to login
+  // if (!token) {
+  //   const url = new URL("/login", request.url);
+  //   url.searchParams.set("callbackUrl", pathname);
+  //   return NextResponse.redirect(url);
+  // }
 
-  try {
-    // Get user role from the token (you'll need to implement this based on your token structure)
-    const userRole = getUserRoleFromToken(token);
+  // try {
+  //   // Get user role from the token (you'll need to implement this based on your token structure)
+  //   const userRole = getUserRoleFromToken(token);
 
-    // Check admin routes
-    if (adminPathPattern.test(pathname) && userRole !== "admin") {
-      return NextResponse.redirect(new URL("/unauthorized", request.url));
-    }
+  //   // Check admin routes
+  //   if (adminPathPattern.test(pathname) && userRole !== "admin") {
+  //     return NextResponse.redirect(new URL("/unauthorized", request.url));
+  //   }
 
-    // Check patient routes
-    if (patientPathPattern.test(pathname) && userRole !== "PATIENT") {
-      return NextResponse.redirect(new URL("/unauthorized", request.url));
-    }
+  //   // Check patient routes
+  //   if (patientPathPattern.test(pathname) && userRole !== "patient") {
+  //     return NextResponse.redirect(new URL("/unauthorized", request.url));
+  //   }
 
-    return NextResponse.next();
-  } catch (error) {
-    // If token is invalid, redirect to login
-    const url = new URL("/login", request.url);
-    url.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(url);
-  }
+  //   return NextResponse.next();
+  // } catch (error) {
+  //   // If token is invalid, redirect to login
+  //   const url = new URL("/login", request.url);
+  //   url.searchParams.set("callbackUrl", pathname);
+  //   return NextResponse.redirect(url);
+  // }
 }
 
 // Helper function to extract role from JWT token
 function getUserRoleFromToken(token: string): string {
   try {
-    const base64Payload = token.split(".")[1];
-    const payload = JSON.parse(Buffer.from(base64Payload, "base64").toString());
+    const base64Payloads = token.split(".");
+    for (const base64Payload of base64Payloads) {
+      const payload = JSON.parse(
+        Buffer.from(base64Payload, "base64").toString()
+      );
+      // Check realm_access roles first
+      if (payload.realm_access?.roles?.includes("admin")) {
+        return "admin";
+      }
 
-    // Check realm_access roles first
-    if (payload.realm_access?.roles?.includes("admin")) {
-      return "admin";
+      // Check resource_access roles
+      if (
+        payload.resource_access?.["realm-management"]?.roles?.includes(
+          "realm-admin"
+        )
+      ) {
+        return "admin";
+      }
     }
 
-    // Check resource_access roles
-    if (
-      payload.resource_access?.["realm-management"]?.roles?.includes(
-        "realm-admin"
-      )
-    ) {
-      return "admin";
-    }
-
-    return "user"; // Default to PATIENT if no admin role found
+    return "patient"; // Default to PATIENT if no admin role found
   } catch {
-    return "user";
+    return "patient";
   }
 }
 

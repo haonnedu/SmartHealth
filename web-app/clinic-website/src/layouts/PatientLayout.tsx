@@ -1,3 +1,4 @@
+import Header from "@/components/manage-site/header";
 import {
   AppShell,
   Burger,
@@ -14,11 +15,16 @@ import {
   IconHome2,
   IconNotes,
 } from "@tabler/icons-react";
-import { ReactNode } from "react";
+import { useRouter } from "next/router";
+import { ReactNode, useState } from "react";
 
 const navItems = [
   { label: "Dashboard", icon: IconHome2 },
-  { label: "My Appointments", icon: IconCalendar },
+  { 
+    label: "My Appointments", 
+    icon: IconCalendar, 
+    href: "/patient/appointment"
+  },
   { label: "OPD", icon: IconHeartbeat },
   { label: "Download Center", icon: IconDownload },
   { label: "Notes", icon: IconNotes },
@@ -31,6 +37,12 @@ interface PatientLayoutProps {
 export default function PatientLayout({ children }: PatientLayoutProps) {
   const [navbarOpened, { toggle }] = useDisclosure(true);
   const collapsed = !navbarOpened;
+  const router = useRouter();
+  const [title, setTitle] = useState("Patient Dashboard");
+  const handleNavClick = (href: string, label: string) => {
+    router.push(href);
+    setTitle(label);
+  };
 
   return (
     <AppShell
@@ -54,15 +66,17 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
               onClick={toggle}
               aria-label="Toggle navigation"
             />
+            <Header title={title} />
           </Group>
         </Group>
       </AppShell.Header>
 
       {/* Navbar */}
-      <AppShell.Navbar p="xs">
+      <AppShell.Navbar p="xs" className="bg-blue-500 text-white">
         <ScrollArea h="100%">
           {navItems.map((item) => {
             const Icon = item.icon;
+            const isActive = router.pathname === item.href;
             return (
               <Tooltip
                 label={item.label}
@@ -76,6 +90,9 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
                   variant="light"
                   px={collapsed ? "sm" : "md"}
                   leftSection={<Icon size={16} stroke={1.5} />}
+                  className={`hover:bg-blue-600 ${isActive ? 'bg-blue-700 text-white' : ''}`}
+                  active={isActive}
+                  onClick={() => handleNavClick(item.href || '', item.label)}
                 />
               </Tooltip>
             );

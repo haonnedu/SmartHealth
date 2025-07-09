@@ -36,7 +36,9 @@
 .bg-gradient-to-br:hover {
   background-position: 100% 50%;
 }
-
+.navbar-gradient:hover {
+  background-position:initial !important;
+}
 /* Theme change animation */
 @keyframes themeChange {
   0% {
