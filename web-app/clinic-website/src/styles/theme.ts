@@ -1,7 +1,7 @@
-import { MantineThemeOverride } from "@mantine/core";
+import { MantineThemeOverride, MantineTheme } from "@mantine/core";
 
 export type ThemeMode = "light" | "dark";
-export type ThemeColor = "pink" | "blue" | "teal" | "violet";
+export type ThemeColor = "pink" | "blue" | "teal" | "violet" | "navbar";
 
 const baseTheme: MantineThemeOverride = {
   fontFamily: "Inter, sans-serif",
@@ -44,6 +44,16 @@ const baseTheme: MantineThemeOverride = {
           fontWeight: 500,
         },
       },
+    },
+    Navbar: {
+      styles: (theme: MantineTheme) => ({
+        root: {
+          backgroundColor:
+            (theme as any).colorScheme === "dark"
+              ? theme.colors.dark[6]
+              : theme.colors.gray[1],
+        },
+      }),
     },
   },
 };
@@ -117,6 +127,23 @@ const themeColors = {
     },
     primaryColor: "violet" as const,
   },
+  navbar: {
+    colors: {
+      navbar: [
+        "#F3F0FF",
+        "#E5DBFF",
+        "#D0BFFF",
+        "#B197FC",
+        "#9775FA",
+        "#845EF7",
+        "#7950F2",
+        "#7048E8",
+        "#6741D9",
+        "#5F3DC4",
+      ] as const,
+    },
+    primaryColor: "navbar" as const,
+  },
 };
 
 const themeModes = {
@@ -159,7 +186,7 @@ const themeModes = {
 };
 
 export const getTheme = (
-  color: ThemeColor = "pink", 
+  color: ThemeColor = "blue",
   mode: ThemeMode = "light"
 ): MantineThemeOverride => {
   return {
@@ -169,4 +196,4 @@ export const getTheme = (
   };
 };
 
-export const defaultTheme = getTheme("pink", "light");
+export const defaultTheme = getTheme("blue", "light");

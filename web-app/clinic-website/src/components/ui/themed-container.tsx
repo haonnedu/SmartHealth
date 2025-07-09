@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 interface ThemedContainerProps {
   children: ReactNode;
   className?: string;
-  variant?: "primary" | "secondary" | "accent";
+  variant?: "primary" | "secondary" | "accent" | "navbar" | "button";
 }
 
 export function ThemedContainer({
@@ -33,6 +33,16 @@ export function ThemedContainer({
       "bg-gradient-to-br",
       `from-${themeStyles.accentColor}`,
       "to-transparent"
+    ),
+    navbar: cn(
+      "navbar-gradient",
+      "bg-gradient-to-r",
+      themeStyles.navbarGradient,
+      "text-black"
+    ),
+    button: cn(
+      themeStyles.buttonColor,
+      "text-black",
     ),
   };
 

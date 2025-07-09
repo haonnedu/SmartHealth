@@ -30,7 +30,7 @@ const tenantThemes: Record<string, TenantTheme> = {
 };
 
 const defaultTheme: TenantTheme = {
-  primaryColor: "pink",
+  primaryColor: "blue",
   mode: "light",
   brandName: "SmartHealth",
   logo: "/images/Health_care.png",
@@ -88,11 +88,15 @@ export function getThemeStyles(theme: TenantTheme) {
       gradient: "from-pink-100 to-pink-50",
       accent: "pink-600",
       secondary: "from-pink-500 to-violet-500",
+      navbar: "from-pink-400 to-pink-50",
+      button: "bg-pink-500 text-white",
     },
     blue: {
       gradient: "from-blue-100 to-blue-50",
       accent: "blue-600",
       secondary: "from-blue-500 to-indigo-500",
+      navbar: "from-blue-400 to-blue-50",
+      button: "bg-blue-500 text-white",
     },
     teal: {
       gradient:
@@ -101,19 +105,25 @@ export function getThemeStyles(theme: TenantTheme) {
           : "from-teal-100 to-teal-50",
       accent: theme.mode === "dark" ? "teal-400" : "teal-600",
       secondary: "from-teal-500 to-emerald-500",
+      navbar: "from-teal-400 to-teal-50",
+      button: "bg-teal-500 text-white",
     },
     violet: {
       gradient: "from-violet-100 to-violet-50",
       accent: "violet-600",
       secondary: "from-violet-500 to-purple-500",
+      navbar: "from-violet-400 to-violet-50",
+      button: "bg-violet-500 text-white",
     },
   };
 
   return {
-    primaryGradient: colorMap[theme.primaryColor].gradient,
-    secondaryGradient: colorMap[theme.primaryColor].secondary,
-    accentColor: colorMap[theme.primaryColor].accent,
+    primaryGradient: colorMap[theme.primaryColor as keyof typeof colorMap].gradient,
+    secondaryGradient: colorMap[theme.primaryColor as keyof typeof colorMap].secondary,
+    navbarGradient: colorMap[theme.primaryColor as keyof typeof colorMap].navbar,
+    accentColor: colorMap[theme.primaryColor as keyof typeof colorMap].accent,
     borderRadius: "rounded-lg",
+    buttonColor: colorMap[theme.primaryColor as keyof typeof colorMap].button,
     buttonVariant: theme.mode === "dark" ? "outline" : "filled",
   };
 }

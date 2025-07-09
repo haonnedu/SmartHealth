@@ -39,7 +39,7 @@ interface ThemeProviderProps {
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const [tenantTheme, setTenantTheme] = useState<TenantTheme>({
-    primaryColor: "pink",
+    primaryColor: "blue",
     mode: "light",
     brandName: "SmartHealth",
     logo: "/images/Health_care.png",
