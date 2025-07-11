@@ -14,6 +14,7 @@ import '@mantine/notifications/styles.css';
 import { MantineProvider } from "@mantine/core";
 import { Notifications } from '@mantine/notifications';
 import { ModalsProvider } from '@mantine/modals';
+import 'mantine-datatable/styles.layer.css';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const getLayout =

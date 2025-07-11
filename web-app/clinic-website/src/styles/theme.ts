@@ -4,9 +4,9 @@ export type ThemeMode = "light" | "dark";
 export type ThemeColor = "pink" | "blue" | "teal" | "violet" | "navbar";
 
 const baseTheme: MantineThemeOverride = {
-  fontFamily: "Inter, sans-serif",
+  fontFamily: "Roboto Slab, sans-serif",
   headings: {
-    fontFamily: "Inter, sans-serif",
+    fontFamily: "Roboto Slab, sans-serif",
     sizes: {
       h1: { fontSize: "2.5rem" },
       h2: { fontSize: "2rem" },

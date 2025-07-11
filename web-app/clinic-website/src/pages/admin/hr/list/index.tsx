@@ -7,19 +7,19 @@ export default function AdminHRList() {
   return (
     <>
       <div className="flex justify-end gap-2 ">
-        <Button variant="outline"
+        <Button variant="outline" size="xs" radius="xs"
           leftSection={<IconSearch size={16} />}
         >
           Search
         </Button>
-        <Button variant="outline"
+        <Button variant="outline" size="xs" radius="xs"
           leftSection={<IconPlus size={16} />}
           >
             Add Staff
           </Button>
       </div>
     <ThemedContainer variant="primary">
-      <Grid className="mt-4 p-4 rounded-lg">
+      <Grid className="mt-4 rounded-lg">
         <Grid.Col span={2}>
           <Input.Wrapper label="Staff ID" description="" error={false}>
             <Input placeholder="Staff ID" />

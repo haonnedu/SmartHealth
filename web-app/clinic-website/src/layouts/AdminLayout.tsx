@@ -24,6 +24,7 @@ import { useRouter } from "next/router";
 import { ReactNode, useState } from "react";
 import { ThemedContainer } from "@/components/ui/themed-container";
 import { useTheme } from "@/providers/ThemeProvider";
+
 interface AdminLayoutProps {
   children: ReactNode;
 }
@@ -73,7 +74,7 @@ const navItems = [
           {
             label: "Leave Type",
             icon: IconCalendar,
-            href: "/admin/master-data/leave-type",
+            href: "/admin/master-data/human-resource/leave-type",
           },
           {
             label: "Department",
