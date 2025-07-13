@@ -35,7 +35,18 @@ export class MasterDataService {
     return this.masterDataRespository.save(masterData);
   }
 
-  createSubData(createSubDataDto: CreateSubDataDto) {
+  async createSubData(createSubDataDto: CreateSubDataDto) {
+    const existingSubData = await this.subDataRespository.findOne({
+      where: {
+        masterDataCode: createSubDataDto.masterDataCode,
+        subDataCode: createSubDataDto.subDataCode,
+      },
+    });
+    if (existingSubData) {
+      throw new BadRequestException(
+        `Mã loại dữ liệu ${createSubDataDto.subDataCode} đã tồn tại.`,
+      );
+    }
     const subMasterData = this.subDataRespository.create(createSubDataDto);
     return this.subDataRespository.save(subMasterData);
   }
