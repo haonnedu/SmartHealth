@@ -18,7 +18,7 @@ export default function LeaveType() {
           Add Leave Type
         </Button>
       </div>
-      <ThemedContainer variant="primary" className="mt-4">
+      {/* <ThemedContainer variant="primary" className="mt-4">
         <Grid className="rounded-lg p-4">
           <Grid.Col span={3}>
             <Input.Wrapper label="Leave Type" description="" error={false}>
@@ -26,7 +26,7 @@ export default function LeaveType() {
             </Input.Wrapper>
           </Grid.Col>
         </Grid>
-      </ThemedContainer>
+      </ThemedContainer> */}
       <ThemedContainer variant="primary" className="mt-4">
         <HrMstDataList />
       </ThemedContainer>
