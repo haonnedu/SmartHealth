@@ -19,7 +19,7 @@ export default function AdminHRList() {
           </Button>
       </div>
     <ThemedContainer variant="primary">
-      <Grid className="mt-4 rounded-lg">
+      <Grid className="mt-4 p-4 rounded-lg">
         <Grid.Col span={2}>
           <Input.Wrapper label="Staff ID" description="" error={false}>
             <Input placeholder="Staff ID" />

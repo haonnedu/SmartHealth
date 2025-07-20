@@ -22,7 +22,7 @@ export class MasterDataController {
     return this.masterDataService.createMasterData(createMasterDatumDto);
   }
 
-  @Post('/createSubrData')
+  @Post('/createSubData')
   createSubrData(@Body() createSubDataDto: CreateSubDataDto) {
     return this.masterDataService.createSubData(createSubDataDto);
   }
@@ -83,7 +83,7 @@ export class MasterDataController {
     );
   }
 
-  @Patch('/updateSubDataByCode/:code')
+  @Patch('/updateSubDataByCode/:masterCode/:subCode')
   updateSubDataByCode(
     @Param('masterCode') masterCode: string,
     @Param('subCode') subCode: string,

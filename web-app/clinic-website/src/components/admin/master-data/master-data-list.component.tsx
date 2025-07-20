@@ -119,7 +119,8 @@ const MasterDataListComponent: React.FC<MasterDataListComponentProps> = ({
 
       <MasterDataPopUp 
         opened={opened} 
-        onClose={close} data={popUpData} 
+        onClose={close} 
+        data={popUpData} 
         onSubmit={(data) => {
           loadMasterData();
         }}
