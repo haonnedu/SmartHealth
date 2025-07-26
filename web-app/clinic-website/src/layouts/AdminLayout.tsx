@@ -51,9 +51,9 @@ const navItems = [
         href: "/admin/hr/list",
       },
       {
-        label: "Staff Entry",
+        label: "Staff Management",
         icon: IconPlus,
-        href: "/admin/hr/entry",
+        href: "/admin/hr/management",
       },
     ],
   },
