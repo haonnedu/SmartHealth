@@ -12,6 +12,7 @@ env:
   REGION: asia-southeast1
   AR_REPO: microservices
   RUNTIME_SA: cloud-run-runtime@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
+  LOGS_BUCKET: gs://smarthealth-build-logs
 
 jobs:
   deploy:
@@ -23,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ---- Auth vào GCP bằng WIF (không key JSON) ----
+      # ---- Auth GCP bằng WIF ----
       - id: auth
         uses: google-github-actions/auth@v2
         with:
@@ -33,65 +34,122 @@ jobs:
 
       - uses: google-github-actions/setup-gcloud@v2
 
-      # (Tùy chọn) đảm bảo repo Artifact Registry tồn tại
+      # ---- Ensure logs bucket & grant writer (cho Cloud Build SA) ----
+      - name: Ensure logs bucket & grant writer
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Tạo bucket nếu chưa có
+          gcloud storage buckets describe "${LOGS_BUCKET}" || \
+          gcloud storage buckets create "${LOGS_BUCKET}" --location="${REGION}" --uniform-bucket-level-access
+
+          # Lấy project number & cấp quyền ghi object cho Cloud Build SA
+          PROJECT_NUMBER="$(gcloud projects describe "${{ secrets.GCP_PROJECT_ID }}" --format='value(projectNumber)')"
+
+          gcloud storage buckets add-iam-policy-binding "${LOGS_BUCKET}" \
+            --member="serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com" \
+            --role="roles/storage.objectCreator"
+
+      # ---- Ensure Artifact Registry repo ----
       - name: Ensure Artifact Registry repo
         run: |
-          gcloud artifacts repositories describe $AR_REPO --location=$REGION || \
-          gcloud artifacts repositories create $AR_REPO --repository-format=docker --location=$REGION
+          gcloud artifacts repositories describe "$AR_REPO" --location="$REGION" || \
+          gcloud artifacts repositories create "$AR_REPO" --repository-format=docker --location="$REGION"
 
-      # ---------- Build images ----------
+      # ---------- Build images (async + wait, ghi log vào bucket riêng) ----------
       - name: Build & Push identity-service
+        shell: bash
         run: |
-          IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/identity:${{ github.sha }}
-          gcloud builds submit ./identity-service --tag $IMAGE
-          echo "IMAGE_IDENTITY=$IMAGE" >> $GITHUB_ENV
+          set -euo pipefail
+          IMAGE="${REGION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${AR_REPO}/identity:${{ github.sha }}"
+          BUILD_ID="$(gcloud builds submit ./identity-service \
+            --region="${REGION}" \
+            --tag "${IMAGE}" \
+            --gcs-log-dir="${LOGS_BUCKET}/build-logs" \
+            --format='value(id)' \
+            --async)"
+          gcloud builds wait "${BUILD_ID}" --region="${REGION}"
+          echo "IMAGE_IDENTITY=${IMAGE}" >> "$GITHUB_ENV"
 
       - name: Build & Push web-app-service
+        shell: bash
         run: |
-          IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/web-app-service:${{ github.sha }}
-          gcloud builds submit ./web-app-service --tag $IMAGE
-          echo "IMAGE_WEBAPP=$IMAGE" >> $GITHUB_ENV
+          set -euo pipefail
+          IMAGE="${REGION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${AR_REPO}/web-app-service:${{ github.sha }}"
+          BUILD_ID="$(gcloud builds submit ./web-app-service \
+            --region="${REGION}" \
+            --tag "${IMAGE}" \
+            --gcs-log-dir="${LOGS_BUCKET}/build-logs" \
+            --format='value(id)' \
+            --async)"
+          gcloud builds wait "${BUILD_ID}" --region="${REGION}"
+          echo "IMAGE_WEBAPP=${IMAGE}" >> "$GITHUB_ENV"
 
       - name: Build & Push api-gateway
+        shell: bash
         run: |
-          IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/api-gateway:${{ github.sha }}
-          gcloud builds submit ./api-gateway --tag $IMAGE
-          echo "IMAGE_GATEWAY=$IMAGE" >> $GITHUB_ENV
+          set -euo pipefail
+          IMAGE="${REGION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${AR_REPO}/api-gateway:${{ github.sha }}"
+          BUILD_ID="$(gcloud builds submit ./api-gateway \
+            --region="${REGION}" \
+            --tag "${IMAGE}" \
+            --gcs-log-dir="${LOGS_BUCKET}/build-logs" \
+            --format='value(id)' \
+            --async)"
+          gcloud builds wait "${BUILD_ID}" --region="${REGION}"
+          echo "IMAGE_GATEWAY=${IMAGE}" >> "$GITHUB_ENV"
 
       - name: Build & Push clinic-web
+        shell: bash
         run: |
-          IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/clinic-web:${{ github.sha }}
-          gcloud builds submit ./clinic-web --tag $IMAGE
-          echo "IMAGE_CLINIC=$IMAGE" >> $GITHUB_ENV
+          set -euo pipefail
+          IMAGE="${REGION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${AR_REPO}/clinic-web:${{ github.sha }}"
+          BUILD_ID="$(gcloud builds submit ./clinic-web \
+            --region="${REGION}" \
+            --tag "${IMAGE}" \
+            --gcs-log-dir="${LOGS_BUCKET}/build-logs" \
+            --format='value(id)' \
+            --async)"
+          gcloud builds wait "${BUILD_ID}" --region="${REGION}"
+          echo "IMAGE_CLINIC=${IMAGE}" >> "$GITHUB_ENV"
 
       - name: Build & Push keycloak
+        shell: bash
         run: |
-          IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/keycloak:${{ github.sha }}
-          gcloud builds submit ./keycloak --tag $IMAGE
-          echo "IMAGE_KC=$IMAGE" >> $GITHUB_ENV
+          set -euo pipefail
+          IMAGE="${REGION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${AR_REPO}/keycloak:${{ github.sha }}"
+          BUILD_ID="$(gcloud builds submit ./keycloak \
+            --region="${REGION}" \
+            --tag "${IMAGE}" \
+            --gcs-log-dir="${LOGS_BUCKET}/build-logs" \
+            --format='value(id)' \
+            --async)"
+          gcloud builds wait "${BUILD_ID}" --region="${REGION}"
+          echo "IMAGE_KC=${IMAGE}" >> "$GITHUB_ENV"
 
       # ---------- Deploy theo thứ tự phụ thuộc ----------
       - name: Deploy identity-service
         run: |
           gcloud run deploy identity-service \
-            --image $IMAGE_IDENTITY \
-            --region $REGION \
+            --image "$IMAGE_IDENTITY" \
+            --region "$REGION" \
             --allow-unauthenticated \
-            --service-account $RUNTIME_SA \
+            --service-account "$RUNTIME_SA" \
             --cpu 1 --memory 512Mi --min-instances 0 --max-instances 3 \
             --set-env-vars SPRING_DATASOURCE_USERNAME=postgres \
             --set-secrets SPRING_DATASOURCE_URL=JDBC_IDENTITY:latest,SPRING_DATASOURCE_PASSWORD=DB_PASSWORD:latest
 
-          ID_URL=$(gcloud run services describe identity-service --region $REGION --format="value(status.url)")
-          echo "IDENTITY_URL=$ID_URL" >> $GITHUB_ENV
+          ID_URL=$(gcloud run services describe identity-service --region "$REGION" --format="value(status.url)")
+          echo "IDENTITY_URL=$ID_URL" >> "$GITHUB_ENV"
 
       - name: Deploy web-app-service (internal)
         run: |
           gcloud run deploy web-app-service \
-            --image $IMAGE_WEBAPP \
-            --region $REGION \
+            --image "$IMAGE_WEBAPP" \
+            --region "$REGION" \
             --no-allow-unauthenticated \
-            --service-account $RUNTIME_SA \
+            --service-account "$RUNTIME_SA" \
             --cpu 1 --memory 256Mi --min-instances 0 --max-instances 3 \
             --set-env-vars DB_USERNAME=postgres \
             --set-secrets JDBC_URL=JDBC_WEBAPP:latest,DB_PASSWORD=DB_PASSWORD:latest
@@ -99,20 +157,20 @@ jobs:
       - name: Deploy api-gateway
         run: |
           gcloud run deploy api-gateway \
-            --image $IMAGE_GATEWAY \
-            --region $REGION \
+            --image "$IMAGE_GATEWAY" \
+            --region "$REGION" \
             --allow-unauthenticated \
-            --service-account $RUNTIME_SA \
+            --service-account "$RUNTIME_SA" \
             --cpu 1 --memory 256Mi --min-instances 0 --max-instances 3 \
             --set-env-vars IDENTITY_URL="$IDENTITY_URL"
 
       - name: Deploy clinic-web
         run: |
           gcloud run deploy clinic-web \
-            --image $IMAGE_CLINIC \
-            --region $REGION \
+            --image "$IMAGE_CLINIC" \
+            --region "$REGION" \
             --allow-unauthenticated \
-            --service-account $RUNTIME_SA \
+            --service-account "$RUNTIME_SA" \
             --cpu 1 --memory 256Mi --min-instances 0 --max-instances 3 \
             --set-env-vars NODE_ENV=production,NEXT_PUBLIC_API_URL="https://api.smarthealth.io.vn/api" \
             --set-secrets OPENAI_API_KEY=OPENAI_API_KEY:latest
@@ -120,10 +178,10 @@ jobs:
       - name: Deploy keycloak
         run: |
           gcloud run deploy keycloak \
-            --image $IMAGE_KC \
-            --region $REGION \
+            --image "$IMAGE_KC" \
+            --region "$REGION" \
             --allow-unauthenticated \
-            --service-account $RUNTIME_SA \
+            --service-account "$RUNTIME_SA" \
             --cpu 1 --memory 1Gi --min-instances 0 --max-instances 2 \
             --set-env-vars KC_DB=postgres,KC_DB_USERNAME=postgres \
             --set-secrets KC_DB_URL=JDBC_IDENTITY:latest,KC_DB_PASSWORD=DB_PASSWORD:latest,KEYCLOAK_ADMIN=KEYCLOAK_ADMIN:latest,KEYCLOAK_ADMIN_PASSWORD=KEYCLOAK_ADMIN_PASSWORD:latest \
