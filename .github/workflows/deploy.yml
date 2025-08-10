@@ -10,6 +10,7 @@ concurrency:
 
 env:
   REGION: asia-southeast1
+  BUILD_REGION: global  
   AR_REPO: microservices
   RUNTIME_SA: cloud-run-runtime@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
   LOGS_BUCKET: gs://smarthealth-build-logs
@@ -64,12 +65,12 @@ jobs:
           set -euo pipefail
           IMAGE="${REGION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${AR_REPO}/identity:${{ github.sha }}"
           BUILD_ID="$(gcloud builds submit ./identity-service \
-            --region="${REGION}" \
+            --region="${BUILD_REGION}" \
             --tag "${IMAGE}" \
             --gcs-log-dir="${LOGS_BUCKET}/build-logs" \
             --format='value(id)' \
             --async)"
-          gcloud builds wait "${BUILD_ID}" --region="${REGION}"
+          gcloud builds wait "${BUILD_ID}" --region="${BUILD_REGION}"
           echo "IMAGE_IDENTITY=${IMAGE}" >> "$GITHUB_ENV"
 
       - name: Build & Push web-app-service
@@ -78,12 +79,12 @@ jobs:
           set -euo pipefail
           IMAGE="${REGION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${AR_REPO}/web-app-service:${{ github.sha }}"
           BUILD_ID="$(gcloud builds submit ./web-app-service \
-            --region="${REGION}" \
+            --region="${BUILD_REGION}" \
             --tag "${IMAGE}" \
             --gcs-log-dir="${LOGS_BUCKET}/build-logs" \
             --format='value(id)' \
             --async)"
-          gcloud builds wait "${BUILD_ID}" --region="${REGION}"
+          gcloud builds wait "${BUILD_ID}" --region="${BUILD_REGION}"
           echo "IMAGE_WEBAPP=${IMAGE}" >> "$GITHUB_ENV"
 
       - name: Build & Push api-gateway
@@ -92,12 +93,12 @@ jobs:
           set -euo pipefail
           IMAGE="${REGION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${AR_REPO}/api-gateway:${{ github.sha }}"
           BUILD_ID="$(gcloud builds submit ./api-gateway \
-            --region="${REGION}" \
+            --region="${BUILD_REGION}" \
             --tag "${IMAGE}" \
             --gcs-log-dir="${LOGS_BUCKET}/build-logs" \
             --format='value(id)' \
             --async)"
-          gcloud builds wait "${BUILD_ID}" --region="${REGION}"
+          gcloud builds wait "${BUILD_ID}" --region="${BUILD_REGION}"
           echo "IMAGE_GATEWAY=${IMAGE}" >> "$GITHUB_ENV"
 
       - name: Build & Push clinic-web
@@ -106,12 +107,12 @@ jobs:
           set -euo pipefail
           IMAGE="${REGION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${AR_REPO}/clinic-web:${{ github.sha }}"
           BUILD_ID="$(gcloud builds submit ./clinic-web \
-            --region="${REGION}" \
+            --region="${BUILD_REGION}" \
             --tag "${IMAGE}" \
             --gcs-log-dir="${LOGS_BUCKET}/build-logs" \
             --format='value(id)' \
             --async)"
-          gcloud builds wait "${BUILD_ID}" --region="${REGION}"
+          gcloud builds wait "${BUILD_ID}" --region="${BUILD_REGION}"
           echo "IMAGE_CLINIC=${IMAGE}" >> "$GITHUB_ENV"
 
       - name: Build & Push keycloak
@@ -120,12 +121,12 @@ jobs:
           set -euo pipefail
           IMAGE="${REGION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${AR_REPO}/keycloak:${{ github.sha }}"
           BUILD_ID="$(gcloud builds submit ./keycloak \
-            --region="${REGION}" \
+            --region="${BUILD_REGION}" \
             --tag "${IMAGE}" \
             --gcs-log-dir="${LOGS_BUCKET}/build-logs" \
             --format='value(id)' \
             --async)"
-          gcloud builds wait "${BUILD_ID}" --region="${REGION}"
+          gcloud builds wait "${BUILD_ID}" --region="${BUILD_REGION}"
           echo "IMAGE_KC=${IMAGE}" >> "$GITHUB_ENV"
 
       # ---------- Deploy theo thứ tự phụ thuộc ----------
