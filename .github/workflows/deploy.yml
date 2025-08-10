@@ -44,30 +44,40 @@ jobs:
         run: |
           IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/identity:${{ github.sha }}
           gcloud builds submit ./identity-service --tag $IMAGE
+          --gcs-log-dir=gs://smarthealth-build-logs/build-logs
+          --no-stream-logs
           echo "IMAGE_IDENTITY=$IMAGE" >> $GITHUB_ENV
 
       - name: Build & Push web-app-service
         run: |
           IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/web-app-service:${{ github.sha }}
           gcloud builds submit ./web-app-service --tag $IMAGE
+          --gcs-log-dir=gs://smarthealth-build-logs/build-logs
+          --no-stream-logs
           echo "IMAGE_WEBAPP=$IMAGE" >> $GITHUB_ENV
 
       - name: Build & Push api-gateway
         run: |
           IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/api-gateway:${{ github.sha }}
           gcloud builds submit ./api-gateway --tag $IMAGE
+          --gcs-log-dir=gs://smarthealth-build-logs/build-logs
+          --no-stream-logs
           echo "IMAGE_GATEWAY=$IMAGE" >> $GITHUB_ENV
 
       - name: Build & Push clinic-web
         run: |
           IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/clinic-web:${{ github.sha }}
           gcloud builds submit ./clinic-web --tag $IMAGE
+          --gcs-log-dir=gs://smarthealth-build-logs/build-logs
+          --no-stream-logs
           echo "IMAGE_CLINIC=$IMAGE" >> $GITHUB_ENV
 
       - name: Build & Push keycloak
         run: |
           IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/keycloak:${{ github.sha }}
           gcloud builds submit ./keycloak --tag $IMAGE
+          --gcs-log-dir=gs://smarthealth-build-logs/build-logs
+          --no-stream-logs
           echo "IMAGE_KC=$IMAGE" >> $GITHUB_ENV
 
       # ---------- Deploy theo thứ tự phụ thuộc ----------
