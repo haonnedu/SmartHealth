@@ -173,7 +173,7 @@ jobs:
             --allow-unauthenticated \
             --service-account "$RUNTIME_SA" \
             --cpu 1 --memory 512Mi --min-instances 0 --max-instances 3 \
-            --set-env-vars SPRING_DATASOURCE_USERNAME=postgres \
+            --set-env-vars SPRING_DATASOURCE_USERNAME=postgres.munjhtusfnmmibzgjple \
             --set-secrets SPRING_DATASOURCE_URL=JDBC_IDENTITY:latest,SPRING_DATASOURCE_PASSWORD=DB_PASSWORD:latest
 
           ID_URL=$(gcloud run services describe identity-service --region "$REGION" --format="value(status.url)")
@@ -188,7 +188,7 @@ jobs:
             --no-allow-unauthenticated \
             --service-account "$RUNTIME_SA" \
             --cpu 1 --memory 256Mi --min-instances 0 --max-instances 3 \
-            --set-env-vars DB_USERNAME=postgres \
+            --set-env-vars DB_USERNAME=postgres.munjhtusfnmmibzgjple \
             --set-secrets JDBC_URL=JDBC_WEBAPP:latest,DB_PASSWORD=DB_PASSWORD:latest
 
       - name: Deploy api-gateway
