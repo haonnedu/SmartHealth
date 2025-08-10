@@ -9,11 +9,15 @@ export class TypeOrmConfig implements TypeOrmOptionsFactory {
       host: 'aws-0-ap-southeast-1.pooler.supabase.com',
       port: 6543,
       username: 'postgres.munjhtusfnmmibzgjple',
-      password: '1234',
-      schema: 'web-app-service',
+      password: process.env.DB_PASSWORD,
+      schema: 'web_app_service',
       database: 'postgres',
       entities: [__dirname + '/../modules/**/*.entity{.ts,.js}'],
       synchronize: true, // chỉ dùng cho dev
+      ssl: true,                                   // Supabase yêu cầu SSL
+      extra: {
+        ssl: { rejectUnauthorized: false },        // tránh lỗi cert
+      },
     };
   }
 }
