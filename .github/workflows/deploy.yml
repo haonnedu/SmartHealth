@@ -1,0 +1,130 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [ "main" ]
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGION: asia-southeast1
+  AR_REPO: microservices
+  RUNTIME_SA: cloud-run-runtime@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
+
+jobs:
+  deploy:
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ---- Auth vào GCP bằng WIF (không key JSON) ----
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      # (Tùy chọn) đảm bảo repo Artifact Registry tồn tại
+      - name: Ensure Artifact Registry repo
+        run: |
+          gcloud artifacts repositories describe $AR_REPO --location=$REGION || \
+          gcloud artifacts repositories create $AR_REPO --repository-format=docker --location=$REGION
+
+      # ---------- Build images ----------
+      - name: Build & Push identity-service
+        run: |
+          IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/identity:${{ github.sha }}
+          gcloud builds submit ./identity-service --tag $IMAGE
+          echo "IMAGE_IDENTITY=$IMAGE" >> $GITHUB_ENV
+
+      - name: Build & Push web-app-service
+        run: |
+          IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/web-app-service:${{ github.sha }}
+          gcloud builds submit ./web-app-service --tag $IMAGE
+          echo "IMAGE_WEBAPP=$IMAGE" >> $GITHUB_ENV
+
+      - name: Build & Push api-gateway
+        run: |
+          IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/api-gateway:${{ github.sha }}
+          gcloud builds submit ./api-gateway --tag $IMAGE
+          echo "IMAGE_GATEWAY=$IMAGE" >> $GITHUB_ENV
+
+      - name: Build & Push clinic-web
+        run: |
+          IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/clinic-web:${{ github.sha }}
+          gcloud builds submit ./clinic-web --tag $IMAGE
+          echo "IMAGE_CLINIC=$IMAGE" >> $GITHUB_ENV
+
+      - name: Build & Push keycloak
+        run: |
+          IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/keycloak:${{ github.sha }}
+          gcloud builds submit ./keycloak --tag $IMAGE
+          echo "IMAGE_KC=$IMAGE" >> $GITHUB_ENV
+
+      # ---------- Deploy theo thứ tự phụ thuộc ----------
+      - name: Deploy identity-service
+        run: |
+          gcloud run deploy identity-service \
+            --image $IMAGE_IDENTITY \
+            --region $REGION \
+            --allow-unauthenticated \
+            --service-account $RUNTIME_SA \
+            --cpu 1 --memory 512Mi --min-instances 0 --max-instances 3 \
+            --set-env-vars SPRING_DATASOURCE_USERNAME=postgres \
+            --set-secrets SPRING_DATASOURCE_URL=JDBC_IDENTITY:latest,SPRING_DATASOURCE_PASSWORD=DB_PASSWORD:latest
+
+          ID_URL=$(gcloud run services describe identity-service --region $REGION --format="value(status.url)")
+          echo "IDENTITY_URL=$ID_URL" >> $GITHUB_ENV
+
+      - name: Deploy web-app-service (internal)
+        run: |
+          gcloud run deploy web-app-service \
+            --image $IMAGE_WEBAPP \
+            --region $REGION \
+            --no-allow-unauthenticated \
+            --service-account $RUNTIME_SA \
+            --cpu 1 --memory 256Mi --min-instances 0 --max-instances 3 \
+            --set-env-vars DB_USERNAME=postgres \
+            --set-secrets JDBC_URL=JDBC_WEBAPP:latest,DB_PASSWORD=DB_PASSWORD:latest
+
+      - name: Deploy api-gateway
+        run: |
+          gcloud run deploy api-gateway \
+            --image $IMAGE_GATEWAY \
+            --region $REGION \
+            --allow-unauthenticated \
+            --service-account $RUNTIME_SA \
+            --cpu 1 --memory 256Mi --min-instances 0 --max-instances 3 \
+            --set-env-vars IDENTITY_URL="$IDENTITY_URL"
+
+      - name: Deploy clinic-web
+        run: |
+          gcloud run deploy clinic-web \
+            --image $IMAGE_CLINIC \
+            --region $REGION \
+            --allow-unauthenticated \
+            --service-account $RUNTIME_SA \
+            --cpu 1 --memory 256Mi --min-instances 0 --max-instances 3 \
+            --set-env-vars NODE_ENV=production,NEXT_PUBLIC_API_URL="https://api.smarthealth.io.vn/api" \
+            --set-secrets OPENAI_API_KEY=OPENAI_API_KEY:latest
+
+      - name: Deploy keycloak
+        run: |
+          gcloud run deploy keycloak \
+            --image $IMAGE_KC \
+            --region $REGION \
+            --allow-unauthenticated \
+            --service-account $RUNTIME_SA \
+            --cpu 1 --memory 1Gi --min-instances 0 --max-instances 2 \
+            --set-env-vars KC_DB=postgres,KC_DB_USERNAME=postgres \
+            --set-secrets KC_DB_URL=JDBC_IDENTITY:latest,KC_DB_PASSWORD=DB_PASSWORD:latest,KEYCLOAK_ADMIN=KEYCLOAK_ADMIN:latest,KEYCLOAK_ADMIN_PASSWORD=KEYCLOAK_ADMIN_PASSWORD:latest \
+            --args start,--proxy=edge,--hostname=keycloak.smarthealth.io.vn,--hostname-strict=false,--http-enabled=true,--http-port=\$PORT

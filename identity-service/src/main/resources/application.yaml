@@ -7,9 +7,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://103.166.183.74:5432/identity_service
-    username: identity_admin
-    password: MyStrongPassword456@
+    url: jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?user=postgres.munjhtusfnmmibzgjple&password=1234
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10

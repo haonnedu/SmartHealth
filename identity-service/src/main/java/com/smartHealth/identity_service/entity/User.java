@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "users", schema = "smart_health")
+@Table(name = "users", schema = "identity_service")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

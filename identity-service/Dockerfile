@@ -1,28 +1,25 @@
-# Stage 1: Build ứng dụng Spring Boot
-FROM maven:3.9.6-eclipse-temurin-17 AS builder
-
-# Thiết lập thư mục làm việc
-WORKDIR /app
-
-# Copy file pom.xml và tải dependencies
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
-
-# Copy toàn bộ mã nguồn và build
-COPY src ./src
-RUN mvn clean package -DskipTests
-
-# Stage 2: Tạo image chạy ứng dụng
-FROM eclipse-temurin:17-jre-alpine
-
-# Thiết lập thư mục làm việc
-WORKDIR /app
-
-# Copy file JAR từ stage build
-COPY --from=builder /app/target/*.jar app.jar
-
-# Mở port ứng dụng
-EXPOSE 8081
-
-# Lệnh chạy ứng dụng
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# ---------- BUILD ----------
+    FROM maven:3.9.6-eclipse-temurin-17 AS builder
+    WORKDIR /app
+    COPY pom.xml .
+    RUN mvn -B -q dependency:go-offline
+    COPY src ./src
+    RUN mvn -B -q -DskipTests clean package
+    
+    # ---------- RUNTIME ----------
+    FROM eclipse-temurin:17-jre-alpine
+    WORKDIR /app
+    
+    # Tạo user non-root
+    RUN addgroup -S app && adduser -S app -G app
+    USER app
+    
+    ARG JAR_FILE=/app/target/*-SNAPSHOT.jar
+    COPY --from=builder ${JAR_FILE} /app/app.jar
+    
+    ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:InitialRAMPercentage=25 -XX:+UseG1GC"
+    ENV SPRING_PROFILES_ACTIVE=prod
+    
+    # Quan trọng: đọc PORT Cloud Run (dùng shell để expand biến)
+    CMD sh -c 'exec java $JAVA_OPTS -jar /app/app.jar --server.port=${PORT:-8080}'
+    

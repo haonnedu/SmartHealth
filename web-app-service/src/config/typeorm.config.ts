@@ -6,12 +6,12 @@ export class TypeOrmConfig implements TypeOrmOptionsFactory {
   createTypeOrmOptions(): TypeOrmModuleOptions {
     return {
       type: 'postgres',
-      host: '103.166.183.74',
-      port: 5432,
-      username: 'identity_admin',
-      password: 'MyStrongPassword456@',
-      database: 'identity_service',
-      schema: 'smart_health',
+      host: 'aws-0-ap-southeast-1.pooler.supabase.com',
+      port: 6543,
+      username: 'postgres.munjhtusfnmmibzgjple',
+      password: '1234',
+      schema: 'web-app-service',
+      database: 'postgres',
       entities: [__dirname + '/../modules/**/*.entity{.ts,.js}'],
       synchronize: true, // chỉ dùng cho dev
     };
