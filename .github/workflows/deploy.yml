@@ -9,7 +9,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  # Cloud Run & Artifact Registry region
   REGION: asia-southeast1
+  # Cloud Build region (dùng global để tránh quota theo region)
   BUILD_REGION: global
   AR_REPO: microservices
   RUNTIME_SA: cloud-run-runtime@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
@@ -25,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Detect changes
+      # Detect changes để build Keycloak có điều kiện
       - name: Check file changes
         id: changes
         uses: dorny/paths-filter@v2
@@ -34,6 +36,7 @@ jobs:
             keycloak:
               - 'keycloak/**'
 
+      # ---- Auth GCP bằng WIF (không dùng key JSON) ----
       - id: auth
         uses: google-github-actions/auth@v2
         with:
@@ -43,17 +46,24 @@ jobs:
 
       - uses: google-github-actions/setup-gcloud@v2
 
+      # ---- Ensure logs bucket & grant writer cho Cloud Build SA ----
       - name: Ensure logs bucket & grant writer
         shell: bash
         run: |
           set -euo pipefail
+          # Tạo bucket nếu chưa có (nên cùng region với hệ thống)
           gcloud storage buckets describe "${LOGS_BUCKET}" || \
           gcloud storage buckets create "${LOGS_BUCKET}" --location="${REGION}" --uniform-bucket-level-access
+
+          # Lấy project number để xác định SA của Cloud Build
           PROJECT_NUMBER="$(gcloud projects describe "${{ secrets.GCP_PROJECT_ID }}" --format='value(projectNumber)')"
+
+          # Cho Cloud Build SA quyền ghi object vào bucket logs
           gcloud storage buckets add-iam-policy-binding "${LOGS_BUCKET}" \
             --member="serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com" \
             --role="roles/storage.objectCreator"
 
+      # ---- Ensure Artifact Registry repo ----
       - name: Ensure Artifact Registry repo
         shell: bash
         run: |
@@ -61,6 +71,7 @@ jobs:
           gcloud artifacts repositories describe "${AR_REPO}" --location="${REGION}" || \
           gcloud artifacts repositories create "${AR_REPO}" --repository-format=docker --location="${REGION}"
 
+      # ---- Helper: build & wait (polling, không stream logs) ----
       - name: Define build helper
         shell: bash
         run: |
@@ -69,13 +80,17 @@ jobs:
             local SRC_DIR="$1"
             local IMAGE="$2"
             echo "Submitting build for ${SRC_DIR} -> ${IMAGE}"
+
             BUILD_ID="$(gcloud builds submit "${SRC_DIR}" \
               --region="${BUILD_REGION}" \
               --tag "${IMAGE}" \
               --gcs-log-dir="${LOGS_BUCKET}/build-logs" \
               --format='value(id)' \
               --async)"
+
             echo "Build ID: ${BUILD_ID}"
+
+            # Poll trạng thái đến khi hoàn tất
             while true; do
               STATUS="$(gcloud builds describe "${BUILD_ID}" \
                         --region="${BUILD_REGION}" \
@@ -90,12 +105,15 @@ jobs:
             done
             echo "Build finished: ${STATUS}"
           }
+
+          # Lưu hàm cho các step sau
           declare -f build_and_wait > /tmp/build_helper.sh
 
-      # ---- Build 4 service bắt buộc ----
+      # ---------- Build images ----------
       - name: Build & Push identity-service
         shell: bash
         run: |
+          set -euo pipefail
           source /tmp/build_helper.sh
           IMAGE="${REGION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${AR_REPO}/identity:${{ github.sha }}"
           build_and_wait "./identity-service" "${IMAGE}"
@@ -104,6 +122,7 @@ jobs:
       - name: Build & Push web-app-service
         shell: bash
         run: |
+          set -euo pipefail
           source /tmp/build_helper.sh
           IMAGE="${REGION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${AR_REPO}/web-app-service:${{ github.sha }}"
           build_and_wait "./web-app-service" "${IMAGE}"
@@ -112,6 +131,7 @@ jobs:
       - name: Build & Push api-gateway
         shell: bash
         run: |
+          set -euo pipefail
           source /tmp/build_helper.sh
           IMAGE="${REGION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${AR_REPO}/api-gateway:${{ github.sha }}"
           build_and_wait "./api-gateway" "${IMAGE}"
@@ -120,22 +140,24 @@ jobs:
       - name: Build & Push clinic-web
         shell: bash
         run: |
+          set -euo pipefail
           source /tmp/build_helper.sh
           IMAGE="${REGION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${AR_REPO}/clinic-web:${{ github.sha }}"
           build_and_wait "./clinic-web" "${IMAGE}"
           echo "IMAGE_CLINIC=${IMAGE}" >> "$GITHUB_ENV"
 
-      # ---- Build Keycloak chỉ khi có thay đổi ----
+      # ---- Build Keycloak chỉ khi có thay đổi trong keycloak/** ----
       - name: Build & Push keycloak
         if: steps.changes.outputs.keycloak == 'true'
         shell: bash
         run: |
+          set -euo pipefail
           source /tmp/build_helper.sh
           IMAGE="${REGION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${AR_REPO}/keycloak:${{ github.sha }}"
           build_and_wait "./keycloak" "${IMAGE}"
           echo "IMAGE_KC=${IMAGE}" >> "$GITHUB_ENV"
 
-      # ---------- Deploy ----------
+      # ---------- Deploy theo thứ tự phụ thuộc ----------
       - name: Deploy identity-service
         shell: bash
         run: |
@@ -147,6 +169,7 @@ jobs:
             --cpu 1 --memory 512Mi --min-instances 0 --max-instances 3 \
             --set-env-vars SPRING_DATASOURCE_USERNAME=postgres \
             --set-secrets SPRING_DATASOURCE_URL=JDBC_IDENTITY:latest,SPRING_DATASOURCE_PASSWORD=DB_PASSWORD:latest
+
           ID_URL=$(gcloud run services describe identity-service --region "$REGION" --format="value(status.url)")
           echo "IDENTITY_URL=$ID_URL" >> "$GITHUB_ENV"
 
