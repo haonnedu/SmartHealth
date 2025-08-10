@@ -38,12 +38,6 @@ jobs:
         with:
           project_id: ${{ env.PROJECT_ID }}
 
-      - name: Debug auth
-        run: |
-          gcloud auth list
-          gcloud config list
-          gcloud projects describe "$PROJECT_ID" --format="value(projectNumber)"
-
       - name: Set gcloud defaults
         run: |
           set -e
