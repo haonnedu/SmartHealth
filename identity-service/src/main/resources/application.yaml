@@ -6,21 +6,23 @@ server:
     redirect-context-root: false
 
 spring:
-   datasource:
+  datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: update
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
       idle-timeout: 30000
       max-lifetime: 1800000
       connection-timeout: 30000
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+      
   security:
     oauth2:
       resourceserver:
