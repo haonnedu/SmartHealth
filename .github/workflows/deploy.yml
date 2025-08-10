@@ -11,9 +11,7 @@ concurrency:
 env:
   REGION: asia-southeast1
   AR_REPO: microservices
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   RUNTIME_SA: cloud-run-runtime@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
-  CB_LOG_DIR: gs://smarthealth-build-logs/build-logs
 
 jobs:
   deploy:
@@ -32,165 +30,110 @@ jobs:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
-          export_default_credentials: true
 
       - uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ env.PROJECT_ID }}
 
-      - name: Set gcloud defaults
-        run: |
-          set -e
-          gcloud config set project "$PROJECT_ID"
-          gcloud config set run/region "$REGION"
-
-      # Ensure Artifact Registry repo exists (inside same region/project)
+      # (Tùy chọn) đảm bảo repo Artifact Registry tồn tại
       - name: Ensure Artifact Registry repo
         run: |
-          set -e
-          gcloud artifacts repositories describe "$AR_REPO" --location="$REGION" --project="$PROJECT_ID" || \
-          gcloud artifacts repositories create  "$AR_REPO" \
-            --repository-format=docker \
-            --location="$REGION" \
-            --project="$PROJECT_ID"
-
-      # ---------- helper: submit build (no streaming) & wait ----------
-      - name: Define build function
-        shell: bash
-        run: |
-          set -euo pipefail
-          cat > /tmp/build_and_wait.sh <<'EOF'
-          #!/usr/bin/env bash
-          set -euo pipefail
-          SRC_DIR="$1"
-          TAG="$2"
-          PROJECT_ID="$3"
-          LOG_DIR="$4"
-
-          BUILD_ID=$(gcloud builds submit "$SRC_DIR" \
-            --tag "$TAG" \
-            --project="$PROJECT_ID" \
-            --gcs-log-dir="$LOG_DIR" \
-            --no-stream-logs \
-            --async \
-            --format="value(metadata.build.id)")
-          echo "Build ID: $BUILD_ID"
-
-          # Poll status until terminal state
-          while true; do
-            STATUS=$(gcloud builds describe "$BUILD_ID" --project="$PROJECT_ID" --format="value(status)")
-            echo "Status: $STATUS"
-            case "$STATUS" in
-              SUCCESS) exit 0 ;;
-              FAILURE|CANCELLED|TIMEOUT) echo "Build failed with status: $STATUS"; exit 2 ;;
-              *) sleep 5 ;;
-            esac
-          done
-          EOF
-          chmod +x /tmp/build_and_wait.sh
+          gcloud artifacts repositories describe $AR_REPO --location=$REGION || \
+          gcloud artifacts repositories create $AR_REPO --repository-format=docker --location=$REGION
 
       # ---------- Build images ----------
       - name: Build & Push identity-service
         run: |
-          set -euo pipefail
-          IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/identity:${{ github.sha }}"
-          /tmp/build_and_wait.sh "./identity-service" "$IMAGE" "$PROJECT_ID" "$CB_LOG_DIR"
+          IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/identity:${{ github.sha }}
+          gcloud builds submit ./identity-service --tag $IMAGE \
+          --gcs-log-dir=gs://smarthealth-build-logs/build-logs \
+          --no-stream-logs
           echo "IMAGE_IDENTITY=$IMAGE" >> $GITHUB_ENV
 
       - name: Build & Push web-app-service
         run: |
-          set -euo pipefail
-          IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/web-app-service:${{ github.sha }}"
-          /tmp/build_and_wait.sh "./web-app-service" "$IMAGE" "$PROJECT_ID" "$CB_LOG_DIR"
+          IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/web-app-service:${{ github.sha }}
+          gcloud builds submit ./web-app-service --tag $IMAGE \
+          --gcs-log-dir=gs://smarthealth-build-logs/build-logs \
+          --no-stream-logs
           echo "IMAGE_WEBAPP=$IMAGE" >> $GITHUB_ENV
 
       - name: Build & Push api-gateway
         run: |
-          set -euo pipefail
-          IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/api-gateway:${{ github.sha }}"
-          /tmp/build_and_wait.sh "./api-gateway" "$IMAGE" "$PROJECT_ID" "$CB_LOG_DIR"
+          IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/api-gateway:${{ github.sha }}
+          gcloud builds submit ./api-gateway --tag $IMAGE \
+          --gcs-log-dir=gs://smarthealth-build-logs/build-logs \
+          --no-stream-logs
           echo "IMAGE_GATEWAY=$IMAGE" >> $GITHUB_ENV
 
       - name: Build & Push clinic-web
         run: |
-          set -euo pipefail
-          IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/clinic-web:${{ github.sha }}"
-          /tmp/build_and_wait.sh "./clinic-web" "$IMAGE" "$PROJECT_ID" "$CB_LOG_DIR"
+          IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/clinic-web:${{ github.sha }}
+          gcloud builds submit ./clinic-web --tag $IMAGE \
+          --gcs-log-dir=gs://smarthealth-build-logs/build-logs \
+          --no-stream-logs 
           echo "IMAGE_CLINIC=$IMAGE" >> $GITHUB_ENV
 
       - name: Build & Push keycloak
         run: |
-          set -euo pipefail
-          IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/keycloak:${{ github.sha }}"
-          /tmp/build_and_wait.sh "./keycloak" "$IMAGE" "$PROJECT_ID" "$CB_LOG_DIR"
+          IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/keycloak:${{ github.sha }}
+          gcloud builds submit ./keycloak --tag $IMAGE \
+          --gcs-log-dir=gs://smarthealth-build-logs/build-logs \
+          --no-stream-logs
           echo "IMAGE_KC=$IMAGE" >> $GITHUB_ENV
 
       # ---------- Deploy theo thứ tự phụ thuộc ----------
       - name: Deploy identity-service
         run: |
-          set -euo pipefail
           gcloud run deploy identity-service \
-            --image "$IMAGE_IDENTITY" \
-            --region "$REGION" \
-            --project "$PROJECT_ID" \
+            --image $IMAGE_IDENTITY \
+            --region $REGION \
             --allow-unauthenticated \
-            --service-account "$RUNTIME_SA" \
+            --service-account $RUNTIME_SA \
             --cpu 1 --memory 512Mi --min-instances 0 --max-instances 3 \
             --set-env-vars SPRING_DATASOURCE_USERNAME=postgres \
             --set-secrets SPRING_DATASOURCE_URL=JDBC_IDENTITY:latest,SPRING_DATASOURCE_PASSWORD=DB_PASSWORD:latest
 
-          ID_URL=$(gcloud run services describe identity-service --region "$REGION" --project "$PROJECT_ID" --format="value(status.url)")
+          ID_URL=$(gcloud run services describe identity-service --region $REGION --format="value(status.url)")
           echo "IDENTITY_URL=$ID_URL" >> $GITHUB_ENV
-          echo "IDENTITY_URL is $ID_URL"
 
       - name: Deploy web-app-service (internal)
         run: |
-          set -euo pipefail
           gcloud run deploy web-app-service \
-            --image "$IMAGE_WEBAPP" \
-            --region "$REGION" \
-            --project "$PROJECT_ID" \
+            --image $IMAGE_WEBAPP \
+            --region $REGION \
             --no-allow-unauthenticated \
-            --ingress internal-and-cloud-load-balancing \
-            --service-account "$RUNTIME_SA" \
+            --service-account $RUNTIME_SA \
             --cpu 1 --memory 256Mi --min-instances 0 --max-instances 3 \
             --set-env-vars DB_USERNAME=postgres \
             --set-secrets JDBC_URL=JDBC_WEBAPP:latest,DB_PASSWORD=DB_PASSWORD:latest
 
       - name: Deploy api-gateway
         run: |
-          set -euo pipefail
           gcloud run deploy api-gateway \
-            --image "$IMAGE_GATEWAY" \
-            --region "$REGION" \
-            --project "$PROJECT_ID" \
+            --image $IMAGE_GATEWAY \
+            --region $REGION \
             --allow-unauthenticated \
-            --service-account "$RUNTIME_SA" \
+            --service-account $RUNTIME_SA \
             --cpu 1 --memory 256Mi --min-instances 0 --max-instances 3 \
             --set-env-vars IDENTITY_URL="$IDENTITY_URL"
 
       - name: Deploy clinic-web
         run: |
-          set -euo pipefail
           gcloud run deploy clinic-web \
-            --image "$IMAGE_CLINIC" \
-            --region "$REGION" \
-            --project "$PROJECT_ID" \
+            --image $IMAGE_CLINIC \
+            --region $REGION \
             --allow-unauthenticated \
-            --service-account "$RUNTIME_SA" \
+            --service-account $RUNTIME_SA \
             --cpu 1 --memory 256Mi --min-instances 0 --max-instances 3 \
             --set-env-vars NODE_ENV=production,NEXT_PUBLIC_API_URL="https://api.smarthealth.io.vn/api" \
             --set-secrets OPENAI_API_KEY=OPENAI_API_KEY:latest
 
       - name: Deploy keycloak
         run: |
-          set -euo pipefail
           gcloud run deploy keycloak \
-            --image "$IMAGE_KC" \
-            --region "$REGION" \
-            --project "$PROJECT_ID" \
+            --image $IMAGE_KC \
+            --region $REGION \
             --allow-unauthenticated \
-            --service-account "$RUNTIME_SA" \
+            --service-account $RUNTIME_SA \
             --cpu 1 --memory 1Gi --min-instances 0 --max-instances 2 \
             --set-env-vars KC_DB=postgres,KC_DB_USERNAME=postgres \
             --set-secrets KC_DB_URL=JDBC_IDENTITY:latest,KC_DB_PASSWORD=DB_PASSWORD:latest,KEYCLOAK_ADMIN=KEYCLOAK_ADMIN:latest,KEYCLOAK_ADMIN_PASSWORD=KEYCLOAK_ADMIN_PASSWORD:latest \
