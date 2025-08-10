@@ -8,31 +8,30 @@
     
     # Copy code và build
     COPY . .
-    # Nếu dùng Prisma: RUN npx prisma generate
+    # Nếu dùng Prisma, uncomment:
+    # RUN npx prisma generate
     RUN yarn build
     
     # ---------- RUNTIME STAGE ----------
     FROM node:20-alpine AS runtime
     WORKDIR /app
     
-    # Chỉ copy những thứ cần cho runtime (code đã build + node_modules prod)
-    # Cài đúng prod deps bằng cách re-use lockfile
+    ENV NODE_ENV=production
+    ENV HOST=0.0.0.0
+    
+    # Copy lockfile và cài production deps
     COPY package.json yarn.lock ./
     RUN yarn install --frozen-lockfile --production
     
-    # Copy output build và bất kỳ file cấu hình runtime cần thiết
-    COPY --from=build /app/dist ./dist
+    # Copy output build từ stage build, đảm bảo quyền thuộc về user 'node'
+    COPY --chown=node:node --from=build /app/dist ./dist
     
-    # Bảo mật hơn: chạy bằng user không phải root
-    RUN addgroup -S nodegrp && adduser -S node -G nodegrp
+    # Nếu app cần các file runtime khác (ví dụ prisma schema, .env.example...), copy thêm tại đây
+    # COPY --chown=node:node --from=build /app/prisma ./prisma
+    
+    # Chạy bằng user 'node' có sẵn trong image
     USER node
     
-    # Cloud Run đặt PORT động -> app của bạn phải listen process.env.PORT
-    # (không cần EXPOSE trong Cloud Run, nhưng để lại cũng không sao)
-    ENV NODE_ENV=production
-    ENV HOST=0.0.0.0
-    # Tuỳ NestJS main.ts: đảm bảo dùng process.env.PORT || 3000
-    # EXPOSE 8080
-    
-    CMD ["node", "dist/main"]
+    # NestJS build mặc định ra dist/main.js
+    CMD ["node", "dist/main.js"]
     
