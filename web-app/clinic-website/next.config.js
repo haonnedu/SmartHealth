@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Ví dụ:
+  output: 'standalone',
   reactStrictMode: true,
   async rewrites() {
     return [
