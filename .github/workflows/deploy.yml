@@ -142,8 +142,14 @@ jobs:
         run: |
           set -euo pipefail
           source /tmp/build_helper.sh
+
+          # debug để chắc chắn path đúng
+          pwd
+          ls -la
+          ls -la ./web-app/clinic-website
+
           IMAGE="${REGION}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${AR_REPO}/clinic-web:${{ github.sha }}"
-          build_and_wait "./clinic-web" "${IMAGE}"
+          build_and_wait "./web-app/clinic-website" "${IMAGE}"
           echo "IMAGE_CLINIC=${IMAGE}" >> "$GITHUB_ENV"
 
       # ---- Build Keycloak chỉ khi có thay đổi trong keycloak/** ----
