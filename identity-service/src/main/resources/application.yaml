@@ -61,3 +61,6 @@ springdoc:
     url: /v3/api-docs
 
 
+jwt:
+  secret: "691263dd-1586-4288-bfbd-d8673fe6f5f4"
+  expiration-ms: 3600000   # 1h

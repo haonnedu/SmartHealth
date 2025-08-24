@@ -11,8 +11,8 @@ import java.util.UUID;
 @Table(name = "users", schema = "smart_health")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_id_seq")
+    private Long id;
 
     private String username;
     private String password;

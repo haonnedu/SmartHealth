@@ -17,6 +17,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +40,7 @@ import com.smartHealth.identity_service.dto.reqeuest.ForgotPasswordRequest;
 import com.smartHealth.identity_service.dto.reqeuest.LoginRequest;
 import com.smartHealth.identity_service.dto.reqeuest.RegisterRequest;
 import com.smartHealth.identity_service.dto.response.LoginResponse;
+import com.smartHealth.identity_service.service.JwtService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -44,9 +50,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.core.Response;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 @Tag(name = "Authentication", description = "Authentication endpoints")
 public class AuthController {
     @Value("${keycloak.admin.server-url}")
@@ -69,6 +77,11 @@ public class AuthController {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private Keycloak keycloakAdmin;
+
+    private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
+    private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
     @PostConstruct
     public void init() {
@@ -103,6 +116,7 @@ public class AuthController {
         )
     })
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        /* 
         String tokenEndpoint = keycloakServerUrl + "/realms/" + realm + "/protocol/openid-connect/token";
 
         // Chuẩn bị dữ liệu gửi tới Keycloak
@@ -154,6 +168,12 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.status(401).body("Invalid username or password");
         }
+        */
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
+        authenticationManager.authenticate(authToken); // ném lỗi nếu sai
+        UserDetails user = userDetailsService.loadUserByUsername(loginRequest.getUsername());
+        String token = jwtService.generateToken(user);
+        return ResponseEntity.ok(token);
     }
 
     @PostMapping("/register")
